@@ -2,6 +2,7 @@ package com.mosaiker.userservice.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.User;
+import com.mosaiker.userservice.service.TokenService;
 import com.mosaiker.userservice.service.UserService;
 import com.mosaiker.userservice.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TokenService tokenService;
 
     @RequestMapping("/sendCode")
     public JSONObject sendCode(HttpServletRequest request, String phone) {
@@ -62,20 +66,52 @@ public class UserController {
     /*
     * 登录，根据requestBody中是否含有token字段来判定是否第一次登录
     * 第一次登录，需要提供手机号和密码，返回token
-    * 后续登录，需要提供token，若token没过期，就登录成功，并给token续命，然后返回新的token
+    * 后续登录，需要提供token和uId，若token没过期，就登录成功，并给token续命，然后返回新的token
     * 若token过期，就要求重新进行第一次登录
+    * token是用uId构建的
     * */
-    /*@RequestMapping(value = "/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public JSONObject login(@RequestBody JSONObject request) {
-        JSONObject authJson = new JSONObject();
+        JSONObject result = new JSONObject();
+        //第一次登录，不含token字段
         if (request.getString("token") == null) {
             User user = userService.findUserByPhoneAndPassword(request.getString("phone"), request.getString("password"));
             if (user != null) {
-                switch (user.getStatus()) {
-                    case 1:
+                String role = Utils.statusToRole(user.getStatus());
+                if (role.equals("BANNED")) {
+                    result.put("message", "该用户已被禁用");
+                    return result;
                 }
-                authJson.put("")
+                Long uId = user.getuId();
+                String token = tokenService.createToken(uId, role);
+                result.put("message", "ok");
+                result.put("token", token);
+                result.put("uId", uId);
+                return result;
             }
+            result.put("message", "手机号或密码不正确");
+            return result;
+        } else {
+            //后续登录，只含token字段和uId字段
+            //解析并验证token
+            JSONObject userInfo = tokenService.parseToken(request.getString("token"), request.getLong("uId"));
+            if (!userInfo.getString("message").equals("ok")) {
+                result.put("message", userInfo.getString("message"));
+                return result;
+            }
+            //该token有效，获取token对应用户
+            User user = userService.findUserByUId(request.getLong("uId"));
+            //根据该用户当前最新状态返回禁用信息或更新token
+            String role = Utils.statusToRole(user.getStatus());
+            if (role.equals("BANNED")) {
+                result.put("message", "当前用户已被禁用");
+                return result;
+            }
+            String newToken = tokenService.createToken(userInfo.getLong("uId"), role);
+            result.put("message", "ok");
+            result.put("token", newToken);
+            result.put("uId", request.getLong("uId"));
+            return result;
         }
-    }*/
+    }
 }
