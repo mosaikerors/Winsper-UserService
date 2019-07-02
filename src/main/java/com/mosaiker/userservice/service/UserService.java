@@ -15,4 +15,6 @@ public interface UserService {
     User findUserByPhoneAndPassword(String phone, String password);
 
     User findUserByUIdAndPassword(Long uId, String password);
+
+    User updateUser(User user);
 }

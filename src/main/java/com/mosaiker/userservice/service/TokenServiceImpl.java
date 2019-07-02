@@ -18,12 +18,12 @@ public class TokenServiceImpl implements TokenService{
     @Autowired
     private UserRepository userRepository;
 
-    static final long EXPIRATIONTIME = 15 * 24 * 60 * 60 * 1000;      //15天
+    static final long DEFAULT_EXPIRATION_TIME = 15 * 24 * 60 * 60 * 1000;      //15天
     static final String COMMON_SECRET = "MosA1kER5738h";            //JWT密码
     static final String TOKEN_PREFIX = "Bearer ";        //Token前缀
 
     @Override
-    public String createToken(Long uId, String role) {
+    public String createToken(Long uId, String role, Long expiration_time) {
         User user = userRepository.findUserByUId(uId);
         String secret = Utils.getFullSecret(user.getPassword(), user.getStatus(), COMMON_SECRET);
         String token = Jwts.builder()
@@ -32,11 +32,16 @@ public class TokenServiceImpl implements TokenService{
                 // uId写入标题
                 .setSubject(uId.toString())
                 // 有效期设置
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration_time))
                 // 签名设置
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
         return token;
+    }
+
+    @Override
+    public String createToken(Long uId, String role) {
+        return createToken(uId, role, DEFAULT_EXPIRATION_TIME);
     }
 
     @Override
@@ -69,7 +74,7 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public boolean verifyToken(String token, Long uId, String role) {
+    public boolean verifyTokenRoleIs(String token, Long uId, String role) {
         // 解析 Token
         JSONObject userInfo = parseToken(token, uId);
         if (!userInfo.getString("message").equals("ok")) {
@@ -80,4 +85,20 @@ public class TokenServiceImpl implements TokenService{
         return role.equals(userInfo.get("role"));
     }
 
+    @Override
+    public boolean verifyTokenRoleHave(String token, Long uId, String... roleArray) {
+        // 解析 Token
+        JSONObject userInfo = parseToken(token, uId);
+        if (!userInfo.getString("message").equals("ok")) {
+            //token已过期
+            return false;
+        }
+        // 要求的身份和 token 中含有的身份信息匹配，返回 true
+        for (String role : roleArray) {
+            if (role.equals(userInfo.get("role"))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

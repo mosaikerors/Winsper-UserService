@@ -74,7 +74,8 @@ public class UserController {
     public JSONObject login(@RequestBody JSONObject request) {
         JSONObject result = new JSONObject();
         //第一次登录，不含token字段
-        if (request.getString("token") == null) {
+        String token = request.getString("token");
+        if (token == null) {
             User user = userService.findUserByPhoneAndPassword(request.getString("phone"), request.getString("password"));
             if (user != null) {
                 String role = Utils.statusToRole(user.getStatus());
@@ -83,9 +84,9 @@ public class UserController {
                     return result;
                 }
                 Long uId = user.getuId();
-                String token = tokenService.createToken(uId, role);
+                String newToken = tokenService.createToken(uId, role);
                 result.put("message", "ok");
-                result.put("token", token);
+                result.put("token", newToken);
                 result.put("uId", uId);
                 return result;
             }
@@ -94,7 +95,7 @@ public class UserController {
         } else {
             //后续登录，只含token字段和uId字段
             //解析并验证token
-            JSONObject userInfo = tokenService.parseToken(request.getString("token"), request.getLong("uId"));
+            JSONObject userInfo = tokenService.parseToken(token, request.getLong("uId"));
             if (!userInfo.getString("message").equals("ok")) {
                 result.put("message", userInfo.getString("message"));
                 return result;
@@ -113,5 +114,23 @@ public class UserController {
             result.put("uId", request.getLong("uId"));
             return result;
         }
+    }
+
+    @RequestMapping(value = "/updateInfo", method = RequestMethod.PUT)
+    public JSONObject updateInfo(@RequestHeader("Authorization")String token ,@RequestBody JSONObject request) {
+        JSONObject result = new JSONObject();
+        if (!tokenService.verifyTokenRoleHave(token, request.getLong("uId"), "USER", "SUPERUSER")) {
+            result.put("message", "抱歉，你没有这个权限");
+            return result;
+        }
+        User user = userService.findUserByUId(request.getLong("uId"));
+        if (user == null) {
+            result.put("message", "该用户id不存在");
+            return result;
+        }
+        user.setUsername(request.getString("username"));
+        userService.updateUser(user);
+        result.put("message", "ok");
+        return result;
     }
 }

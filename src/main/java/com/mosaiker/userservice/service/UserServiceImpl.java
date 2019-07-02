@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String sendCode(String phone, String code) {
         try {
-            ZhenziSmsClient client = new ZhenziSmsClient("http://sms_developer.zhenzikj.com/zhenzisms_user/index.html", "101953", "1c843c7d-ddf2-4e32-b897-637b95639d32");
+            ZhenziSmsClient client = new ZhenziSmsClient("http://sms_developer.zhenzikj.com", "101953", "1c843c7d-ddf2-4e32-b897-637b95639d32");
             String message = "欢迎注册风语^-^,您的验证码为：" + code + "，有效期为5分钟，逾期不候哦~";
             String result = client.send(phone, message);
             JSONObject jsonObject = JSONObject.parseObject(result);
@@ -44,14 +44,9 @@ public class UserServiceImpl implements UserService {
     public String addUser(String name, String phone, String password) {
         if (userRepository.existsUserByPhone(phone))
             return "该手机号已被注册";
-        try {
-            User user = new User(name, password, phone, 1);
-            userRepository.save(user);
-            return "ok";
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return "服务器出错，请稍后重试";
-        }
+        User user = new User(name, password, phone, 1);
+        userRepository.save(user);
+        return "ok";
     }
 
 
@@ -63,5 +58,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByUIdAndPassword(Long uId, String password){
         return userRepository.findUserByUIdAndPassword(uId, password);
+    }
+
+    @Override
+    public User updateUser(User user) {
+        return userRepository.save(user);
     }
 }
