@@ -24,7 +24,7 @@ steps:
     rm: true
     target: /Winsper/user-service
     source:
-    - target/user-service.jar
+    - target/user-service-0.0.1-SNAPSHOT.jar
     - Dockerfile
 
 - name: deploy
