@@ -17,10 +17,10 @@ steps:
 - name: upload
   image: appleboy/drone-scp
   settings:
-    host: 47.103.0.246
+    host: 47.100.126.180 #47.103.0.246
     username: root
     password:
-      from_secret: yjy_password
+      from_secret: tbc_password
     rm: true
     target: /Winsper/user-service
     source:
@@ -30,13 +30,18 @@ steps:
 - name: deploy
   image: appleboy/drone-ssh
   settings:
-    host: 47.103.0.246
+    host: 47.100.126.180 #47.103.0.246
     username: root
     password:
-      from_secret: yjy_password
+      from_secret: tbc_password
     script:
     - cd /Winsper/user-service/target
     - cp ../Dockerfile .
     - docker build -t winsper-user-service .
     - docker rm -f winsper-user-service-c
     - docker run -d --name winsper-user-service-c -p 7180:7180 winsper-user-service
+
+volumes:
+- name: dependency
+  host:
+    path: /root/.m2
