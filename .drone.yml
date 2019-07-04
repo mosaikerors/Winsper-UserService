@@ -11,7 +11,7 @@ steps:
 #   path: /drone/src/back-end/src/main/resources/application.yml
   commands:
   - mvn clean
-  - mvn package
+  - mvn package -Dmaven.test.skip=true
   - echo "test and package user-service completed 🙂🙂🙂"
 
 - name: upload
