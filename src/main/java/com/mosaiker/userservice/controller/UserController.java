@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public JSONObject signup(HttpSession session ,@RequestBody JSONObject request) {
+    public JSONObject signup(@RequestBody JSONObject request) {
         String token = request.getString("token");
         String phone = request.getString("phone");
         JSONObject result = new JSONObject();
@@ -110,9 +110,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/updateInfo", method = RequestMethod.PUT)
-    public JSONObject updateInfo(@RequestHeader("Authorization")String token ,@RequestBody JSONObject request) {
+    public JSONObject updateInfo(@RequestBody JSONObject request) {
         JSONObject result = new JSONObject();
-        if (!tokenService.verifyTokenRoleHave(token, request.getLong("uId"), "USER", "SUPERUSER")) {
+        String token = request.getString("token");
+        if (token==null||!tokenService.verifyTokenRoleHave(token, request.getLong("uId"), "USER", "SUPERUSER")) {
             result.put("message", "抱歉，你没有这个权限");
             return result;
         }
