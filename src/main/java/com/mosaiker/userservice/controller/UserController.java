@@ -81,6 +81,8 @@ public class UserController {
                 result.put("message", "ok");
                 result.put("token", newToken);
                 result.put("uId", uId);
+                result.put("username",user.getUsername());
+                result.put("status", user.getStatus());
                 return result;
             }
             result.put("message", "手机号或密码不正确");
@@ -105,6 +107,8 @@ public class UserController {
             result.put("message", "ok");
             result.put("token", newToken);
             result.put("uId", request.getLong("uId"));
+            result.put("username",user.getUsername());
+            result.put("status", user.getStatus());
             return result;
         }
     }
