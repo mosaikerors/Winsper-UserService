@@ -20,8 +20,9 @@ public class UserController {
     @Autowired
     private TokenService tokenService;
 
-    @RequestMapping("/sendCode")
-    public JSONObject sendCode(HttpServletRequest request, String phone) {
+    @RequestMapping(value = "/sendCode", method = RequestMethod.POST)
+    public JSONObject sendCode(@RequestBody JSONObject request) {
+        String phone = request.getString("phone");
         JSONObject result = new JSONObject();
         if (userService.findUserByPhone(phone) != null) {
             result.put("message", "该手机号已被注册！");
@@ -32,35 +33,27 @@ public class UserController {
             result.put("message", "发送验证码失败，请稍后重试");
             return result;
         }
-        HttpSession session = request.getSession();
-        JSONObject codeDetails = new JSONObject();
-        codeDetails.put("verifyCode", code);
-        codeDetails.put("phone", phone);
-        codeDetails.put("createTime", System.currentTimeMillis());
-        session.setAttribute("codeDetails", codeDetails);
+        String token = tokenService.createCodeToken(phone, code, 5 * 60 * 1000L);
         result.put("message", "ok");
+        result.put("token", token);
         return result;
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public JSONObject signup(HttpSession session ,@RequestBody JSONObject request) {
-        JSONObject codeDetails = (JSONObject) session.getAttribute("codeDetails");
+        String token = request.getString("token");
+        String phone = request.getString("phone");
         JSONObject result = new JSONObject();
-        if (!codeDetails.getString("verifyCode").equals(request.getString("code"))) {
-            result.put("message","验证码错误");
+        String msg = tokenService.verifyCodeToken(token, phone, request.getString("code"));
+        if (msg.equals("ok")) {
+            msg = userService.addUser(request.getString("username"), request.getString("phone"), request.getString("password"));
+            result.put("message", msg);
             return result;
         }
-        if (!codeDetails.getString("phone").equals(request.getString("phone"))) {
-            result.put("message", "前后手机号不一致");
+        else{
+            result.put("message", msg);
             return result;
         }
-        if ((System.currentTimeMillis() - codeDetails.getLong("createTime")) > 1000 * 60 * 5) {
-            result.put("message", "验证码过期啦");
-            return result;
-        }
-        String msg = userService.addUser(request.getString("username"), request.getString("phone"), request.getString("password"));
-        result.put("message", msg);
-        return result;
     }
 
     /*
