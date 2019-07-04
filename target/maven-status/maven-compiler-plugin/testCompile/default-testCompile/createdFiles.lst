@@ -1,0 +1,4 @@
+com\mosaiker\userservice\service\UserServiceImplTest.class
+com\mosaiker\userservice\utils\UtilsTest.class
+com\mosaiker\userservice\controller\UserControllerTest.class
+com\mosaiker\userservice\service\TokenServiceImplTest.class

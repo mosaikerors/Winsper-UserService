@@ -1,0 +1,47 @@
+kind: pipline
+name: Winsper-UserService
+
+steps:
+- name: test
+  image: maven
+  volumes:
+  - name: dependency
+    path: /root/.m2
+# - name: configuration
+#   path: /drone/src/back-end/src/main/resources/application.yml
+  commands:
+  - mvn clean
+  - mvn package
+  - echo "test and package user-service completed 🙂🙂🙂"
+
+- name: upload
+  image: appleboy/drone-scp
+  settings:
+    host: 47.103.0.246
+    username: root
+    password:
+      from_secret: yjy_password
+    rm: true
+    target: /Winsper/user-service
+    source:
+    - target/user-service-0.0.1-SNAPSHOT.jar
+    - Dockerfile
+
+- name: deploy
+  image: appleboy/drone-ssh
+  settings:
+    host: 47.103.0.246
+    username: root
+    password:
+      from_secret: yjy_password
+    script:
+    - cd /Winsper/user-service/target
+    - cp ../Dockerfile .
+    - docker build -t winsper-user-service .
+    - docker rm -f winsper-user-service-c
+    - docker run -d --name winsper-user-service-c -p 7180:7180 winsper-user-service
+
+volumes:
+- name: dependency
+  host:
+    path: /root/.m2
