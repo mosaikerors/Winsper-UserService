@@ -14,6 +14,33 @@ steps:
   - mvn package -Dmaven.test.skip=true
   - echo "test and package user-service completed 🙂🙂🙂"
 
+- name: upload_czn
+  image: appleboy/drone-scp
+  settings:
+    host: 47.102.205.224
+    username: root
+    password:
+      from_secret: czn_password
+    rm: true
+    target: /Winsper/user-service
+    source:
+      - target/user-service-0.0.1-SNAPSHOT.jar
+      - Dockerfile
+
+- name: deploy_czn
+  image: appleboy/drone-ssh
+  settings:
+    host: 47.102.205.224
+    username: root
+    password:
+      from_secret: czn_password
+    script:
+      - cd /Winsper/user-service/target
+      - cp ../Dockerfile .
+      - docker build -t winsper-user-service .
+      - docker rm -f winsper-user-service-c
+      - docker run -d --name winsper-user-service-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=47.102.205.224" -e "SERVER_PORT=7180" winsper-user-service
+
 - name: upload_xyx
   image: appleboy/drone-scp
   settings:
@@ -94,7 +121,6 @@ steps:
       - docker build -t winsper-user-service .
       - docker rm -f winsper-user-service-c
       - docker run -d --name winsper-user-service-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=47.103.0.246" -e "SERVER_PORT=7180" winsper-user-service
-
 
 volumes:
 - name: dependency

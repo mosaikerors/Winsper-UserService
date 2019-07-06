@@ -24,6 +24,8 @@ public class Utils {
                 return  "USER";
             case 2:
                 return  "SUPERUSER";
+            case 100:
+                return "ADMIN";
             default:
                 return "UNKNOWN";
         }
