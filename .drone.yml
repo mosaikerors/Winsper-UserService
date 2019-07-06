@@ -14,7 +14,61 @@ steps:
   - mvn package -Dmaven.test.skip=true
   - echo "test and package user-service completed 🙂🙂🙂"
 
-- name: upload
+- name: upload_xyx
+  image: appleboy/drone-scp
+  settings:
+    host: 101.132.176.33
+    username: root
+    password:
+      from_secret: xyx_password
+    rm: true
+    target: /Winsper/user-service
+    source:
+    - target/user-service-0.0.1-SNAPSHOT.jar
+    - Dockerfile
+
+- name: deploy_xyx
+  image: appleboy/drone-ssh
+  settings:
+    host: 101.132.176.33
+    username: root
+    password:
+      from_secret: xyx_password
+    script:
+    - cd /Winsper/user-service/target
+    - cp ../Dockerfile .
+    - docker build -t winsper-user-service .
+    - docker rm -f winsper-user-service-c
+    - docker run -d --name winsper-user-service-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=101.132.176.33" -e "SERVER_PORT=7180" winsper-user-service
+
+- name: upload_tbc
+  image: appleboy/drone-scp
+  settings:
+    host: 47.100.126.180
+    username: root
+    password:
+      from_secret: tbc_password
+    rm: true
+    target: /Winsper/user-service
+    source:
+      - target/user-service-0.0.1-SNAPSHOT.jar
+      - Dockerfile
+
+- name: deploy_tbc
+  image: appleboy/drone-ssh
+  settings:
+    host: 47.100.126.180
+    username: root
+    password:
+      from_secret: tbc_password
+    script:
+      - cd /Winsper/user-service/target
+      - cp ../Dockerfile .
+      - docker build -t winsper-user-service .
+      - docker rm -f winsper-user-service-c
+      - docker run -d --name winsper-user-service-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=47.100.126.180" -e "SERVER_PORT=7180" winsper-user-service
+
+- name: upload_yjy
   image: appleboy/drone-scp
   settings:
     host: 47.103.0.246
@@ -24,10 +78,10 @@ steps:
     rm: true
     target: /Winsper/user-service
     source:
-    - target/user-service-0.0.1-SNAPSHOT.jar
-    - Dockerfile
+      - target/user-service-0.0.1-SNAPSHOT.jar
+      - Dockerfile
 
-- name: deploy
+- name: deploy_yjy
   image: appleboy/drone-ssh
   settings:
     host: 47.103.0.246
@@ -35,11 +89,11 @@ steps:
     password:
       from_secret: yjy_password
     script:
-    - cd /Winsper/user-service/target
-    - cp ../Dockerfile .
-    - docker build -t winsper-user-service .
-    - docker rm -f winsper-user-service-c
-    - docker run -d --name winsper-user-service-c -p 7180:7180 winsper-user-service
+      - cd /Winsper/user-service/target
+      - cp ../Dockerfile .
+      - docker build -t winsper-user-service .
+      - docker rm -f winsper-user-service-c
+      - docker run -d --name winsper-user-service-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=47.103.0.246" -e "SERVER_PORT=7180" winsper-user-service
 
 volumes:
 - name: dependency
