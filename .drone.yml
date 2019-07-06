@@ -95,6 +95,7 @@ steps:
       - docker rm -f winsper-user-service-c
       - docker run -d --name winsper-user-service-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=47.103.0.246" -e "SERVER_PORT=7180" winsper-user-service
 
+
 volumes:
 - name: dependency
   host:
