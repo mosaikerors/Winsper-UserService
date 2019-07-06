@@ -11,6 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
@@ -77,10 +80,12 @@ public class TokenServiceImplTest {
     public void verifyTokenRoleIs() {
         String token = tokenService.createToken(10000L, "SUPERUSER", 1000L);
         //token已过期
+        List<String> roles = new ArrayList<>();
         try {
             Thread.sleep(2000);
             Assert.assertFalse(tokenService.verifyTokenRoleIs(token,10000L,"SUPERUSER"));
-            Assert.assertFalse(tokenService.verifyTokenRoleHave(token, 10000L, "USER", "SUPERUSER"));
+            roles.add("SUPERUSER");
+            Assert.assertFalse(tokenService.verifyTokenRoleHave(token, 10000L, roles));
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
@@ -89,7 +94,12 @@ public class TokenServiceImplTest {
         Assert.assertFalse(tokenService.verifyTokenRoleIs(token, 10000L, "USER"));
         //token对应身份正确
         Assert.assertTrue(tokenService.verifyTokenRoleIs(token, 10000L, "SUPERUSER"));
-        Assert.assertTrue(tokenService.verifyTokenRoleHave(token, 10000L, "SUPERUSER", "USER"));
-        Assert.assertFalse(tokenService.verifyTokenRoleHave(token, 10000L, "haha"));
+        roles.clear();
+        roles.add("SUPERUSER");
+        roles.add("USER");
+        Assert.assertTrue(tokenService.verifyTokenRoleHave(token, 10000L, roles));
+        roles.clear();
+        roles.add("haha");
+        Assert.assertFalse(tokenService.verifyTokenRoleHave(token, 10000L, roles));
     }
 }

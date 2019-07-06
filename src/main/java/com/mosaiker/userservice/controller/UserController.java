@@ -8,6 +8,8 @@ import com.mosaiker.userservice.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping(value = "/user")
@@ -114,8 +116,28 @@ public class UserController {
     @RequestMapping(value = "/updateInfo", method = RequestMethod.PUT)
     public JSONObject updateInfo(@RequestBody JSONObject request) {
         JSONObject result = new JSONObject();
+        User user = userService.findUserByUId(request.getLong("uId"));
+        if (user == null) {
+            result.put("message", "该用户id不存在");
+            return result;
+        }
+        user.setUsername(request.getString("username"));
+        userService.updateUser(user);
+        result.put("message", "ok");
+        return result;
+    }
+
+    /*
+    * {"uId":10000,"token":"efwfsef.fefesf.efsefsef","roles":["USER","SUPERUSER"]}
+    * the roles can be empty:
+    * {"uId":10000,"token":"efwfsef.fefesf.efsefsef","roles":[]}
+    * */
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public JSONObject anthenticate(@RequestBody JSONObject request) {
+        JSONObject result = new JSONObject();
         String token = request.getString("token");
-        if (token==null||!tokenService.verifyTokenRoleHave(token, request.getLong("uId"), "USER", "SUPERUSER")) {
+        List<String> roleArray = request.getJSONArray("roles").toJavaList(String.class);
+        if (token==null||!tokenService.verifyTokenRoleHave(token, request.getLong("uId"), roleArray)) {
             result.put("message", "抱歉，你没有这个权限");
             return result;
         }
@@ -124,8 +146,6 @@ public class UserController {
             result.put("message", "该用户id不存在");
             return result;
         }
-        user.setUsername(request.getString("username"));
-        userService.updateUser(user);
         result.put("message", "ok");
         return result;
     }

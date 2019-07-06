@@ -2,6 +2,8 @@ package com.mosaiker.userservice.service;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 public interface TokenService {
 
     String createToken(Long uId, String role);
@@ -21,5 +23,5 @@ public interface TokenService {
     * */
     boolean verifyTokenRoleIs(String token, Long uId, String role);
 
-    boolean verifyTokenRoleHave(String token, Long uId, String... roleArray);
+    boolean verifyTokenRoleHave(String token, Long uId, List<String> roleArray);
 }

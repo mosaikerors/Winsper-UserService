@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class TokenServiceImpl implements TokenService{
@@ -120,7 +121,7 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public boolean verifyTokenRoleHave(String token, Long uId, String... roleArray) {
+    public boolean verifyTokenRoleHave(String token, Long uId, List<String> roleArray) {
         // 解析 Token
         JSONObject userInfo = parseToken(token, uId);
         if (!userInfo.getString("message").equals("ok")) {
@@ -128,6 +129,9 @@ public class TokenServiceImpl implements TokenService{
             return false;
         }
         // 要求的身份和 token 中含有的身份信息匹配，返回 true
+        if (roleArray.size() <= 0) {
+            return true;
+        }
         for (String role : roleArray) {
             if (role.equals(userInfo.get("role"))) {
                 return true;
