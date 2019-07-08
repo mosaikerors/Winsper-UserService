@@ -44,11 +44,11 @@ public class TokenServiceImpl implements TokenService{
     public String createCodeToken(String phone, String code, Long expiration_time) {
         return Jwts.builder()
                 // 保存验证码
-                .claim("code", code)
+                .claim("phone", phone)
                 // 有效期设置
                 .setExpiration(new Date(System.currentTimeMillis() + expiration_time))
-                // 签名设置,用phone作为密码来加密
-                .signWith(SignatureAlgorithm.HS512, phone)
+                // 签名设置,用code作为密码来加密
+                .signWith(SignatureAlgorithm.HS512, code)
                 .compact();
     }
 
@@ -57,12 +57,12 @@ public class TokenServiceImpl implements TokenService{
         try {
             Claims claims = Jwts.parser()
                     // 验签
-                    .setSigningKey(phone)
+                    .setSigningKey(code)
                     // 去掉 Bearer
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .getBody();
-            String expectCode = claims.get("code").toString();
-            if (expectCode.equals(code)) {
+            String expectPhone = claims.get("phone").toString();
+            if (expectPhone.equals(phone)) {
                 return "ok";
             } else {
                 return "验证码不正确";
@@ -124,8 +124,10 @@ public class TokenServiceImpl implements TokenService{
     public boolean verifyTokenRoleHave(String token, Long uId, List<String> roleArray) {
         // 解析 Token
         JSONObject userInfo = parseToken(token, uId);
+        System.out.println(userInfo);
         if (!userInfo.getString("message").equals("ok")) {
             //token已过期
+            System.out.println("token expire");
             return false;
         }
         // 要求的身份和 token 中含有的身份信息匹配，返回 true

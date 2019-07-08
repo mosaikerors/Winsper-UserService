@@ -12,7 +12,6 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(value = "/user")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -137,13 +136,16 @@ public class UserController {
         JSONObject result = new JSONObject();
         String token = request.getString("token");
         List<String> roleArray = request.getJSONArray("roles").toJavaList(String.class);
+        System.out.println(token);
+        System.out.println(request.getLong("uId"));
+        System.out.println(roleArray);
         if (token==null||!tokenService.verifyTokenRoleHave(token, request.getLong("uId"), roleArray)) {
-            result.put("message", "抱歉，你没有这个权限");
+            result.put("message", "sorry, you don't have right to do so");  //抱歉，你没有这个权限
             return result;
         }
         User user = userService.findUserByUId(request.getLong("uId"));
         if (user == null) {
-            result.put("message", "该用户id不存在");
+            result.put("message", "uId no exist");  //该用户id不存在
             return result;
         }
         result.put("message", "ok");
