@@ -24,12 +24,12 @@ public class UserController {
         String phone = request.getString("phone");
         JSONObject result = new JSONObject();
         if (userService.findUserByPhone(phone) != null) {
-            result.put("message", "该手机号已被注册！");
+            result.put("message", "u1");  //该手机号已被注册！
             return result;
         }
         String code = Utils.randomNumber(6);
         if (userService.sendCode(phone, code).equals("fail")) {
-            result.put("message", "发送验证码失败，请稍后重试");
+            result.put("message", "u2");  //发送验证码失败，请稍后重试
             return result;
         }
         String token = tokenService.createCodeToken(phone, code, 5 * 60 * 1000L);
@@ -88,20 +88,16 @@ public class UserController {
             return result;
         } else {
             //后续登录，只含token字段和uId字段
-            //解析并验证token
+            //解析并验证token，检查token是否过期，密码改变和状态被禁用都会使token失效
             JSONObject userInfo = tokenService.parseToken(token, request.getLong("uId"));
             if (!userInfo.getString("message").equals("ok")) {
                 result.put("message", userInfo.getString("message"));
                 return result;
             }
-            //该token有效，获取token对应用户
+            //该token有效，获取token对应用户，该用户状态正常，密码没变
             User user = userService.findUserByUId(request.getLong("uId"));
-            //根据该用户当前最新状态返回禁用信息或更新token
+            //根据该用户当前最新状态更新token
             String role = Utils.statusToRole(user.getStatus());
-            if (role.equals("BANNED")) {
-                result.put("message", "当前用户已被禁用");
-                return result;
-            }
             String newToken = tokenService.createToken(userInfo.getLong("uId"), role);
             result.put("message", "ok");
             result.put("token", newToken);

@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+Test set: com.mosaiker.userservice.controller.UserControllerTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 11.561 s <<< FAILURE! - in com.mosaiker.userservice.controller.UserControllerTest
+signup(com.mosaiker.userservice.controller.UserControllerTest)  Time elapsed: 6.361 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+	at com.mosaiker.userservice.controller.UserControllerTest.signup(UserControllerTest.java:129)
+
+updateInfo(com.mosaiker.userservice.controller.UserControllerTest)  Time elapsed: 2.974 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+	at com.mosaiker.userservice.controller.UserControllerTest.updateInfo(UserControllerTest.java:173)
+
+sendCode(com.mosaiker.userservice.controller.UserControllerTest)  Time elapsed: 0.654 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+	at com.mosaiker.userservice.controller.UserControllerTest.sendCode(UserControllerTest.java:63)
+
+authenticate(com.mosaiker.userservice.controller.UserControllerTest)  Time elapsed: 0.501 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+	at com.mosaiker.userservice.controller.UserControllerTest.authenticate(UserControllerTest.java:217)
+

@@ -6,4 +6,5 @@ com\mosaiker\userservice\service\UserService.class
 com\mosaiker\userservice\repository\UserRepository.class
 com\mosaiker\userservice\service\UserServiceImpl.class
 com\mosaiker\userservice\service\TokenServiceImpl.class
+com\mosaiker\userservice\utils\MyJSONUtil.class
 com\mosaiker\userservice\entity\User.class
