@@ -1,5 +1,5 @@
 package com.mosaiker.userservice.controller;
-
+import com.mosaiker.userservice.utils.MyJSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -23,14 +23,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 public class UserControllerTest {
     private MockMvc mockMvc;
-    private MyJSONUtil myJSONUtil;
+   // private MyJSONUtil MyJSONUtil;
     @Mock
     private TokenService tokenService;
     @Mock
@@ -82,7 +80,7 @@ public class UserControllerTest {
         }catch (Exception e){
             System.out.print("Something wrong with test login!");
         }
-        assertEquals(true,myJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
+        assertEquals(true,MyJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
 
         mockParam.clear();
         mockParam.put("token", "1");
@@ -97,7 +95,7 @@ public class UserControllerTest {
         }catch (Exception e){
             System.out.print("Something wrong with test login!");
         }
-        assertEquals(true,myJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
+        assertEquals(true,MyJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
 
         expectResult.clear();
         expectResult.put("message", "手机号或密码不正确");
@@ -114,7 +112,7 @@ public class UserControllerTest {
         }catch (Exception e){
             System.out.print("Something wrong with test login!");
         }
-        assertEquals(true,myJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
+        assertEquals(true,MyJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
 
         expectResult.clear();
         expectResult.put("message", "该用户已被禁用");
@@ -131,7 +129,7 @@ public class UserControllerTest {
         }catch (Exception e){
             System.out.print("Something wrong with test login!");
         }
-        assertEquals(true,myJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
+        assertEquals(true,MyJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
 
         mockParam.clear();
         mockParam.put("uId", 3);
@@ -148,7 +146,7 @@ public class UserControllerTest {
         }catch (Exception e){
             System.out.print("Something wrong with test login!");
         }
-        assertEquals(true,myJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
+        assertEquals(true,MyJSONUtil.compareTwoJSONObject(expectResult,userController.login(mockParam)));
     }
 
     @Test
@@ -169,7 +167,7 @@ public class UserControllerTest {
             System.out.print("Something wrong with test sendCode1!");
         }
 
-        assertEquals(true, myJSONUtil.compareTwoJSONObject(expected1, userController.sendCode(mockParam)));
+        assertEquals(true, MyJSONUtil.compareTwoJSONObject(expected1, userController.sendCode(mockParam)));
 
         mockParam.clear();
         mockParam.put("phone","13111333999");
@@ -188,7 +186,7 @@ public class UserControllerTest {
             System.out.print("Something wrong with test sendCode2!");
         }
 
-        assertEquals(true,myJSONUtil.compareTwoJSONObject(expected2,userController.sendCode(mockParam)));
+        assertEquals(true,MyJSONUtil.compareTwoJSONObject(expected2,userController.sendCode(mockParam)));
 
         mockParam.clear();
         mockParam.put("phone","13111333555");
@@ -208,7 +206,7 @@ public class UserControllerTest {
         }catch (Exception e){
             System.out.print("Something wrong with test sendCode3!");
         }
-        assertEquals(true, myJSONUtil.compareTwoJSONObject(expected3,userController.sendCode(mockParam)));
+        assertEquals(true, MyJSONUtil.compareTwoJSONObject(expected3,userController.sendCode(mockParam)));
 
     }
 
@@ -231,7 +229,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
-            assertTrue(myJSONUtil.compareTwoJSONObject(expected1,userController.signup(mockParam)));
+            assertTrue(MyJSONUtil.compareTwoJSONObject(expected1,userController.signup(mockParam)));
         }catch (Exception e){
             System.out.print("Something wrong with test signup1!");
         }
@@ -253,7 +251,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
-            assertTrue(myJSONUtil.compareTwoJSONObject(expected2,userController.signup(mockParam)));
+            assertTrue(MyJSONUtil.compareTwoJSONObject(expected2,userController.signup(mockParam)));
         }catch (Exception e){
             System.out.print("Something wrong with test signup1!");
         }
@@ -264,38 +262,42 @@ public class UserControllerTest {
     public void updateInfo() {
         JSONObject mockParam = new JSONObject();
         mockParam.put("username","test1");
-        mockParam.put("uID",1234L);
-        when(userService.findUserByUId(1234L)).thenReturn(new User());
+        mockParam.put("uId",1234L);
+        User user = new User("test","test","13000444888",1);
+        user.setuId(1234L);
+        when(userService.findUserByUId(1234L)).thenReturn(user);
+        when(userService.updateUser(anyObject())).thenReturn(user);
         JSONObject expected1 = new JSONObject();
-        expected1.put("message","ok");
+        expected1.put("message", "ok");
         try {
             mockMvc.perform(MockMvcRequestBuilders.put("/updateInfo")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON).content(mockParam.toJSONString()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-            assertTrue(
-                myJSONUtil.compareTwoJSONObject(expected1, userController.signup(mockParam)));
-        }catch(Exception e){
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON).content(mockParam.toJSONString()))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+            assertTrue(MyJSONUtil.compareTwoJSONObject(expected1, userController.updateInfo(mockParam)));
+        }catch(Exception e) {
             System.out.print("Something wrong with test updateInfo1!");
         }
-        mockParam.clear();
-        mockParam.put("username","test2");
-        mockParam.put("uID",1235L);
-        when(userService.findUserByUId(1235L)).thenReturn(null);
-        JSONObject expected2 = new JSONObject();
-        expected2.put("message","uinfo1");
         try {
+            mockParam.clear();
+            mockParam.put("username", "test2");
+            mockParam.put("uId", 1235L);
+            when(userService.findUserByUId(1235L)).thenReturn(null);
+            JSONObject expected2 = new JSONObject();
+            expected2.put("message", "uinfo1");
+
             mockMvc.perform(MockMvcRequestBuilders.put("/updateInfo")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON).content(mockParam.toJSONString()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON).content(mockParam.toJSONString()))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+
             assertTrue(
-                myJSONUtil.compareTwoJSONObject(expected2, userController.signup(mockParam)));
-        }catch(Exception e){
+                    MyJSONUtil.compareTwoJSONObject(expected2, userController.updateInfo(mockParam)));
+        }catch(Exception e) {
             System.out.print("Something wrong with test updateInfo2!");
         }
     }
@@ -307,7 +309,7 @@ public class UserControllerTest {
         role1.add("USER");
         JSONArray roles1 = JSONArray.parseArray(JSON.toJSONString(role1));
         mockParam.put("roles",roles1);
-        mockParam.put("uID",1234L);
+        mockParam.put("uId",1234L);
         when(tokenService.verifyTokenRoleHave("test1.test1.test1", 1234L, role1)).thenReturn(true);
         when(userService.findUserByUId(1234L)).thenReturn(new User());
         JSONObject expected1=new JSONObject();
@@ -319,7 +321,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
-            assertTrue(myJSONUtil.compareTwoJSONObject(expected1,userController.signup(mockParam)));
+            assertTrue(MyJSONUtil.compareTwoJSONObject(expected1,userController.signup(mockParam)));
         }catch (Exception e){
             System.out.print("Something wrong with test authenciation1!");
         }
@@ -329,10 +331,10 @@ public class UserControllerTest {
         List<String> role2 =new ArrayList<>();
         JSONArray roles2 = JSONArray.parseArray(JSON.toJSONString(role2));
         mockParam.put("roles",roles2);
-        mockParam.put("uID",1234L);
+        mockParam.put("uId",1234L);
         when(tokenService.verifyTokenRoleHave("test1.test1.test1", 1234L, role2)).thenReturn(false);
         JSONObject expected2=new JSONObject();
-        expected1.put("message","uauth1");
+        expected2.put("message","uauth1");
         try{
             mockMvc.perform(MockMvcRequestBuilders.post("/authenticate")
                 .accept(MediaType.APPLICATION_JSON)
@@ -340,20 +342,20 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
-            assertTrue(myJSONUtil.compareTwoJSONObject(expected2,userController.signup(mockParam)));
+            assertTrue(MyJSONUtil.compareTwoJSONObject(expected2,userController.anthenticate(mockParam)));
         }catch (Exception e){
             System.out.print("Something wrong with test authenciation2!");
         }
 
         mockParam.clear();
-        mockParam.put("token","");
+        mockParam.put("token","test3.test3.test3");
         List<String> role3 =new ArrayList<>();
         role3.add("USER");
-        JSONArray roles3 = JSONArray.parseArray(JSON.toJSONString(role2));
+        JSONArray roles3 = JSONArray.parseArray(JSON.toJSONString(role3));
         mockParam.put("roles",roles3);
-        mockParam.put("uID",1235L);
+        mockParam.put("uId",1235L);
         when(tokenService.verifyTokenRoleHave("test3.test3.test3", 1235L, role3)).thenReturn(true);
-        when(userService.findUserByUId(1234L)).thenReturn(null);
+        when(userService.findUserByUId(1235L)).thenReturn(null);
         JSONObject expected3=new JSONObject();
         expected3.put("message","uauth2");
         try{
@@ -363,7 +365,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
-            assertTrue(myJSONUtil.compareTwoJSONObject(expected3,userController.signup(mockParam)));
+            assertTrue(MyJSONUtil.compareTwoJSONObject(expected3,userController.anthenticate(mockParam)));
         }catch (Exception e){
             System.out.print("Something wrong with test authenciation3!");
         }

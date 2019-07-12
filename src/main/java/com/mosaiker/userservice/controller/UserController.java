@@ -113,7 +113,7 @@ public class UserController {
         JSONObject result = new JSONObject();
         User user = userService.findUserByUId(request.getLong("uId"));
         if (user == null) {
-            result.put("message", "该用户id不存在");
+            result.put("message", "uinfo1");
             return result;
         }
         user.setUsername(request.getString("username"));
@@ -136,12 +136,12 @@ public class UserController {
         System.out.println(request.getLong("uId"));
         System.out.println(roleArray);
         if (token==null||!tokenService.verifyTokenRoleHave(token, request.getLong("uId"), roleArray)) {
-            result.put("message", "sorry, you don't have right to do so");  //抱歉，你没有这个权限
+            result.put("message", "uauth1");  //抱歉，你没有这个权限
             return result;
         }
         User user = userService.findUserByUId(request.getLong("uId"));
         if (user == null) {
-            result.put("message", "uId no exist");  //该用户id不存在
+            result.put("message", "uauth2");  //该用户id不存在
             return result;
         }
         result.put("message", "ok");

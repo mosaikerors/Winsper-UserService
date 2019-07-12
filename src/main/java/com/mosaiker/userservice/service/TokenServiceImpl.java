@@ -65,12 +65,12 @@ public class TokenServiceImpl implements TokenService{
             if (expectPhone.equals(phone)) {
                 return "ok";
             } else {
-                return "验证码不正确";
+                return "前后手机号不一致";
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             return "验证码已过期";
         } catch (io.jsonwebtoken.SignatureException e) {
-            return "前后手机号不一致";
+            return "验证码不正确";
         }
     }
 

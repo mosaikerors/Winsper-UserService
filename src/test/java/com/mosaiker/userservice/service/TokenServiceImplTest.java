@@ -3,7 +3,6 @@ package com.mosaiker.userservice.service;
 import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.User;
 import com.mosaiker.userservice.repository.UserRepository;
-import jdk.nashorn.internal.parser.Token;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,11 +94,26 @@ public class TokenServiceImplTest {
         //token对应身份正确
         Assert.assertTrue(tokenService.verifyTokenRoleIs(token, 10000L, "SUPERUSER"));
         roles.clear();
+        Assert.assertTrue(tokenService.verifyTokenRoleHave(token, 10000L, roles));
         roles.add("SUPERUSER");
         roles.add("USER");
         Assert.assertTrue(tokenService.verifyTokenRoleHave(token, 10000L, roles));
         roles.clear();
         roles.add("haha");
         Assert.assertFalse(tokenService.verifyTokenRoleHave(token, 10000L, roles));
+    }
+
+    @Test
+    public void verifyCodeToken() {
+        String token = tokenService.createCodeToken("123", "456456", 5000L);
+        assertEquals("ok", tokenService.verifyCodeToken(token, "123", "456456"));
+        assertEquals("前后手机号不一致", tokenService.verifyCodeToken(token, "789", "456456"));
+        assertEquals("验证码不正确", tokenService.verifyCodeToken(token, "123", "789789"));
+        try {
+            Thread.sleep(5000L);
+            assertEquals("验证码已过期", tokenService.verifyCodeToken(token, "123", "456456"));
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
