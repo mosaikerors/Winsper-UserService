@@ -1,7 +1,9 @@
 package com.mosaiker.userservice.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mosaiker.userservice.entity.Account;
 import com.mosaiker.userservice.entity.User;
+import com.mosaiker.userservice.service.AccountService;
 import com.mosaiker.userservice.service.TokenService;
 import com.mosaiker.userservice.service.UserService;
 import com.mosaiker.userservice.utils.Utils;
@@ -18,6 +20,9 @@ public class UserController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private AccountService accountService;
 
     @RequestMapping(value = "/sendCode", method = RequestMethod.POST)
     public JSONObject sendCode(@RequestBody JSONObject request) {
@@ -46,6 +51,10 @@ public class UserController {
         String msg = tokenService.verifyCodeToken(token, phone, request.getString("code"));
         if (msg.equals("ok")) {
             msg = userService.addUser(request.getString("username"), request.getString("phone"), request.getString("password"));
+            //  新增Account
+            long realUId = userService.findUserByPhone(request.getString("phone")).getuId();
+            Account newAccount = new Account(realUId);
+            accountService.addAccount(newAccount);
             result.put("message", msg);
             return result;
         }

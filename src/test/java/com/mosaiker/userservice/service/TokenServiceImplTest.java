@@ -27,9 +27,9 @@ public class TokenServiceImplTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        User superUser = new User("yjy", "123", "15201996738", 2);
+        User superUser = new User("yjy", "123", "15201996738", 2, avatarUrl);
         superUser.setuId(10000L);
-        User user = new User("yjy2", "12345", "15201996739", 1);
+        User user = new User("yjy2", "12345", "15201996739", 1, avatarUrl);
         user.setuId(10001L);
         when(userRepository.findUserByUId(10000L)).thenReturn(superUser);
         when(userRepository.findUserByUId(10001L)).thenReturn(user);

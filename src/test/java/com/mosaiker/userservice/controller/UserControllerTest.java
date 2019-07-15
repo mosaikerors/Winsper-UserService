@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.User;
 import com.mosaiker.userservice.service.TokenService;
 import com.mosaiker.userservice.service.UserService;
-import com.mosaiker.userservice.utils.MyJSONUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -53,9 +53,9 @@ public class UserControllerTest {
         when(tokenService.parseToken("1", 1L)).thenReturn(successUserInfo);
         when(tokenService.parseToken("3", 3L)).thenReturn(failUserInfo);
         when(tokenService.createToken(1L, "USER")).thenReturn("1+");
-        User successUser = new User("ok", "ok", "1", 1);
+        User successUser = new User("ok", "ok", "1", 1, avatarUrl);
         successUser.setuId(1L);
-        User bannedUser = new User("banned", "banned", "3", -1);
+        User bannedUser = new User("banned", "banned", "3", -1, avatarUrl);
         bannedUser.setuId(3L);
         when(userService.findUserByPhoneAndPassword("1", "ok")).thenReturn(successUser);
         when(userService.findUserByUId(1L)).thenReturn(successUser);
@@ -263,7 +263,7 @@ public class UserControllerTest {
         JSONObject mockParam = new JSONObject();
         mockParam.put("username","test1");
         mockParam.put("uId",1234L);
-        User user = new User("test","test","13000444888",1);
+        User user = new User("test","test","13000444888",1, avatarUrl);
         user.setuId(1234L);
         when(userService.findUserByUId(1234L)).thenReturn(user);
         when(userService.updateUser(anyObject())).thenReturn(user);
