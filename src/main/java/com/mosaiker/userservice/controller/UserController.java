@@ -156,4 +156,19 @@ public class UserController {
         result.put("message", "ok");
         return result;
     }
+
+    @RequestMapping(value = "/getSimpleInfo", method = RequestMethod.GET)
+    public JSONObject getSimpleInfo(@RequestParam Long uId) {
+        JSONObject result = new JSONObject();
+        User user = userService.findUserByUId(uId);
+        Account account = accountService.findAccountByUId(uId);
+        if (user == null || account == null) {
+            result.put("message", "ainfo1");
+            return result;
+        }
+        result.put("message", "ok");
+        result.put("avatarUrl", account.getAvatarUrl());
+        result.put("username", user.getUsername());
+        return result;
+    }
 }
