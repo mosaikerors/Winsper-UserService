@@ -35,7 +35,6 @@ steps:
       - cp ../Dockerfile .
       - docker build -t winsper-user-service .
       - docker rm -f winsper-user-service-c
-      - docker run -d --name winsper-user-service-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=10.0.0.98" -e "SERVER_PORT=7180" winsper-user-service
 
 volumes:
 - name: dependency
