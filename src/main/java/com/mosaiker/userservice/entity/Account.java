@@ -3,17 +3,21 @@ package com.mosaiker.userservice.entity;
 import com.alibaba.fastjson.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Id;
 
 @Entity
 public class Account {
-
+  @Id
   private Long uId;
   private String avatarUrl;
   private long feather;
+  @ElementCollection
   private List<Long> follower;
+  @ElementCollection
   private List<Long> following;
   private Long lastCheckIn;
   private Boolean isMessagePublic;
