@@ -99,7 +99,7 @@ public class TokenServiceImpl implements TokenService{
             String role = claims.get("authorities").toString();
             result.put("uId", uId);
             result.put("role", role);
-            result.put("message", "ok");
+            result.put("message", 0);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             result.put("message", "token已过期");
         } catch (io.jsonwebtoken.SignatureException e) {

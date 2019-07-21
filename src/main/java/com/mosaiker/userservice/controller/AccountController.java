@@ -194,4 +194,13 @@ public class AccountController {
     result.put("rescode",msg);
     return result;
   }
+
+  @RequestMapping(value = "/getFollowings", method = RequestMethod.GET)
+  @ResponseBody
+  public JSONObject getFollowings(@RequestParam Long uId) {
+    Account account = accountService.findAccountByUId(uId);
+    JSONObject result = new JSONObject();
+    result.put("following",account.getFollowing());
+    return result;
+  }
 }

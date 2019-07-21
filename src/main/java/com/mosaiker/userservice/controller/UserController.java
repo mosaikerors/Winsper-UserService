@@ -59,7 +59,7 @@ public class UserController {
             return result;
         }
         else{
-            result.put("message", msg);
+            result.put("rescode", msg);
             return result;
         }
     }
@@ -81,7 +81,7 @@ public class UserController {
             if (user != null) {
                 String role = Utils.statusToRole(user.getStatus());
                 if (role.equals("BANNED")) {
-                    result.put("message", "该用户已被禁用");
+                    result.put("rescode", "3");
                     return result;
                 }
                 Long uId = user.getuId();
@@ -101,7 +101,7 @@ public class UserController {
             //解析并验证token，检查token是否过期，密码改变和状态被禁用都会使token失效
             JSONObject userInfo = tokenService.parseToken(token, request.getLong("uId"));
             if (!userInfo.getString("message").equals("ok")) {
-                result.put("message", userInfo.getString("message"));
+                result.put("rescode", userInfo.getString("message"));
                 return result;
             }
             //该token有效，获取token对应用户，该用户状态正常，密码没变
@@ -176,6 +176,8 @@ public class UserController {
         result.put("message", "ok");
         result.put("avatarUrl", account.getAvatarUrl());
         result.put("username", user.getUsername());
+        result.put("isHeanPublic",account.getHeanPublic());
+        result.put("isCollectionPublic",account.getCollectionPublic());
         return result;
     }
 }
