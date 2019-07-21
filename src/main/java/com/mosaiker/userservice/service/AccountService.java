@@ -12,4 +12,20 @@ public interface AccountService {
     String checkIn(Long uId);
 
     String changeAvatar(String newAvatarUrl);
+
+    Integer toggleMessage(Boolean isPublic,Long uId);
+
+    Integer toggleHean(Boolean isPublic,Long uId);
+
+    Integer toggleCollection(Boolean isPublic,Long uId);
+
+    Integer toggleDiary(Boolean isPublic,Long uId);
+
+    Integer toggleJournal(Boolean isPublic,Long uId);
+
+    Integer toggleSubmission(Boolean isPublic,Long uId);
+
+    Integer toggleMood(Boolean isPublic,Long uId);
+
+    Integer toggleComment(Boolean isPublic,Long uId);
 }

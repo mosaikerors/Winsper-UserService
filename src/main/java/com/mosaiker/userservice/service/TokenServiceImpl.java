@@ -53,7 +53,7 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public String verifyCodeToken(String token, String phone, String code) {
+    public Integer verifyCodeToken(String token, String phone, String code) {
         try {
             Claims claims = Jwts.parser()
                     // 验签
@@ -63,14 +63,14 @@ public class TokenServiceImpl implements TokenService{
                     .getBody();
             String expectPhone = claims.get("phone").toString();
             if (expectPhone.equals(phone)) {
-                return "ok";
+                return 0;
             } else {
-                return "前后手机号不一致";
+                return 4;
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            return "验证码已过期";
+            return 1;
         } catch (io.jsonwebtoken.SignatureException e) {
-            return "验证码不正确";
+            return 4;
         }
     }
 

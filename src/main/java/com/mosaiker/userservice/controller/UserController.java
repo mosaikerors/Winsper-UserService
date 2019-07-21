@@ -29,16 +29,16 @@ public class UserController {
         String phone = request.getString("phone");
         JSONObject result = new JSONObject();
         if (userService.findUserByPhone(phone) != null) {
-            result.put("message", "u1");  //该手机号已被注册！
+            result.put("rescode", "3");  //该手机号已被注册！
             return result;
         }
         String code = Utils.randomNumber(6);
         if (userService.sendCode(phone, code).equals("fail")) {
-            result.put("message", "u2");  //发送验证码失败，请稍后重试
+            result.put("rescode", "4");  //发送验证码失败，请稍后重试
             return result;
         }
         String token = tokenService.createCodeToken(phone, code, 5 * 60 * 1000L);
-        result.put("message", "ok");
+        result.put("rescode", "0");
         result.put("token", token);
         return result;
     }
@@ -48,14 +48,14 @@ public class UserController {
         String token = request.getString("token");
         String phone = request.getString("phone");
         JSONObject result = new JSONObject();
-        String msg = tokenService.verifyCodeToken(token, phone, request.getString("code"));
-        if (msg.equals("ok")) {
+        Integer msg = tokenService.verifyCodeToken(token, phone, request.getString("code"));
+        if (msg==0) {
             msg = userService.addUser(request.getString("username"), request.getString("phone"), request.getString("password"));
             //  新增Account
             long realUId = userService.findUserByPhone(request.getString("phone")).getuId();
             Account newAccount = new Account(realUId);
             accountService.addAccount(newAccount);
-            result.put("message", msg);
+            result.put("rescode", msg);
             return result;
         }
         else{
@@ -73,7 +73,7 @@ public class UserController {
     * */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public JSONObject login(@RequestBody JSONObject request) {
-        JSONObject result = new JSONObject();
+        JSONObject result=new JSONObject() ;
         //第一次登录，不含token字段
         String token = request.getString("token");
         if (token == null) {
@@ -85,15 +85,16 @@ public class UserController {
                     return result;
                 }
                 Long uId = user.getuId();
+                Account account = accountService.findAccountByUId(uId);
+                result = account.toJSONObject();
                 String newToken = tokenService.createToken(uId, role);
-                result.put("message", "ok");
+                result.put("rescode", 0);
                 result.put("token", newToken);
-                result.put("uId", uId);
                 result.put("username",user.getUsername());
                 result.put("status", user.getStatus());
                 return result;
             }
-            result.put("message", "手机号或密码不正确");
+            result.put("rescode", "4");
             return result;
         } else {
             //后续登录，只含token字段和uId字段
@@ -107,27 +108,33 @@ public class UserController {
             User user = userService.findUserByUId(request.getLong("uId"));
             //根据该用户当前最新状态更新token
             String role = Utils.statusToRole(user.getStatus());
-            String newToken = tokenService.createToken(userInfo.getLong("uId"), role);
-            result.put("message", "ok");
-            result.put("token", newToken);
-            result.put("uId", request.getLong("uId"));
-            result.put("username",user.getUsername());
-            result.put("status", user.getStatus());
-            return result;
+            if (role.equals("BANNED")) {
+                result.put("rescode",3);
+                return result;
+            }else {
+                Account account = accountService.findAccountByUId(request.getLong("uId"));
+                result = account.toJSONObject();
+                String newToken = tokenService.createToken(userInfo.getLong("uId"), role);
+                result.put("rescode", 0);
+                result.put("token", newToken);
+                result.put("username",user.getUsername());
+                result.put("status", user.getStatus());
+                return result;
+            }
         }
     }
 
-    @RequestMapping(value = "/updateInfo", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update/username", method = RequestMethod.PUT)
     public JSONObject updateInfo(@RequestBody JSONObject request) {
         JSONObject result = new JSONObject();
         User user = userService.findUserByUId(request.getLong("uId"));
         if (user == null) {
-            result.put("message", "uinfo1");
+            result.put("rescode", 1);//该uId不存在
             return result;
         }
         user.setUsername(request.getString("username"));
         userService.updateUser(user);
-        result.put("message", "ok");
+        result.put("rescode", 0);
         return result;
     }
 

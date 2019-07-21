@@ -12,7 +12,7 @@ public interface TokenService {
 
     String createCodeToken(String phone, String code, Long expiration_time);
 
-    String verifyCodeToken(String token, String phone, String code);
+    Integer verifyCodeToken(String token, String phone, String code);
 
     JSONObject parseToken(String token, Long uId);
 
