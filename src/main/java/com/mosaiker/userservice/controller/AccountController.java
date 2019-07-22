@@ -203,4 +203,13 @@ public class AccountController {
     result.put("following",account.getFollowing());
     return result;
   }
+
+  @RequestMapping(value = "/getFollowers", method = RequestMethod.GET)
+  @ResponseBody
+  public JSONObject getFollowers(@RequestParam Long uId) {
+    Account account = accountService.findAccountByUId(uId);
+    JSONObject result = new JSONObject();
+    result.put("follower",account.getFollower());
+    return result;
+  }
 }
