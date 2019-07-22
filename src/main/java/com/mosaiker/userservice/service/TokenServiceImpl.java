@@ -84,7 +84,7 @@ public class TokenServiceImpl implements TokenService{
         JSONObject result = new JSONObject();
         User user = userRepository.findUserByUId(uId);
         if (user == null) {
-            result.put("message", "用户id不存在");
+            result.put("message", 1);
             return result;
         }
         String secret = Utils.getFullSecret(user.getPassword(), user.getStatus(), COMMON_SECRET);
@@ -101,9 +101,9 @@ public class TokenServiceImpl implements TokenService{
             result.put("role", role);
             result.put("message", 0);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            result.put("message", "token已过期");
+            result.put("message", 1);
         } catch (io.jsonwebtoken.SignatureException e) {
-            result.put("message", "token无效");
+            result.put("message", 1);
         }
         return result;
     }
