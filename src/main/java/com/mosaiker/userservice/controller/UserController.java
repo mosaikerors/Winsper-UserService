@@ -29,16 +29,16 @@ public class UserController {
         String phone = request.getString("phone");
         JSONObject result = new JSONObject();
         if (userService.findUserByPhone(phone) != null) {
-            result.put("rescode", "3");  //该手机号已被注册！
+            result.put("rescode", 3);  //该手机号已被注册！
             return result;
         }
         String code = Utils.randomNumber(6);
         if (userService.sendCode(phone, code).equals("fail")) {
-            result.put("rescode", "4");  //发送验证码失败，请稍后重试
+            result.put("rescode", 4);  //发送验证码失败，请稍后重试
             return result;
         }
         String token = tokenService.createCodeToken(phone, code, 5 * 60 * 1000L);
-        result.put("rescode", "0");
+        result.put("rescode", 0);
         result.put("token", token);
         return result;
     }
@@ -81,7 +81,7 @@ public class UserController {
             if (user != null) {
                 String role = Utils.statusToRole(user.getStatus());
                 if (role.equals("BANNED")) {
-                    result.put("rescode", "3");
+                    result.put("rescode", 3);
                     return result;
                 }
                 Long uId = user.getuId();
@@ -94,14 +94,14 @@ public class UserController {
                 result.put("status", user.getStatus());
                 return result;
             }
-            result.put("rescode", "4");
+            result.put("rescode", 4);
             return result;
         } else {
             //后续登录，只含token字段和uId字段
             //解析并验证token，检查token是否过期，密码改变和状态被禁用都会使token失效
             JSONObject userInfo = tokenService.parseToken(token, request.getLong("uId"));
-            if (!userInfo.getString("message").equals("ok")) {
-                result.put("rescode", userInfo.getString("message"));
+            if (!userInfo.getInteger("message").equals(0)) {
+                result.put("rescode", userInfo.getInteger("message"));
                 return result;
             }
             //该token有效，获取token对应用户，该用户状态正常，密码没变
