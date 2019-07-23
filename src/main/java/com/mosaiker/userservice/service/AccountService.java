@@ -11,7 +11,6 @@ public interface AccountService {
 
     String checkIn(Long uId);
 
-    String changeAvatar(String newAvatarUrl);
 
     Integer toggleMessage(Boolean isPublic,Long uId);
 

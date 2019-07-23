@@ -31,10 +31,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String changeAvatar(String newAvatarUrl) {
-        return null;
-    }
-    @Override
     public Integer toggleMessage(Boolean isPublic,Long uId){
         Account user = accountRepository.findAccountByUId(uId);
         user.setMessagePublic(isPublic);

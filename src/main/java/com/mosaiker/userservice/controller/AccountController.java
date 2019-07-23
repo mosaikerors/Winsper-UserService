@@ -48,7 +48,7 @@ public class AccountController {
         account.setLastCheckIn(todayTime);
         account.setFeather(account.getFeather()+1);  //  羽毛+1
         accountService.updateAccount(account);
-        result.put("message", "ok");
+        result.put("rescode", 0);
         result.put("newFeather",account.getFeather());
         return result;
     }
