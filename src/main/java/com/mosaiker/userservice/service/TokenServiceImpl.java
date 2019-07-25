@@ -53,7 +53,7 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public String verifyCodeToken(String token, String phone, String code) {
+    public Integer verifyCodeToken(String token, String phone, String code) {
         try {
             Claims claims = Jwts.parser()
                     // 验签
@@ -63,14 +63,14 @@ public class TokenServiceImpl implements TokenService{
                     .getBody();
             String expectPhone = claims.get("phone").toString();
             if (expectPhone.equals(phone)) {
-                return "ok";
+                return 0;
             } else {
-                return "前后手机号不一致";
+                return 4;
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            return "验证码已过期";
+            return 1;
         } catch (io.jsonwebtoken.SignatureException e) {
-            return "验证码不正确";
+            return 4;
         }
     }
 
@@ -84,7 +84,7 @@ public class TokenServiceImpl implements TokenService{
         JSONObject result = new JSONObject();
         User user = userRepository.findUserByUId(uId);
         if (user == null) {
-            result.put("message", "用户id不存在");
+            result.put("message", 1);
             return result;
         }
         String secret = Utils.getFullSecret(user.getPassword(), user.getStatus(), COMMON_SECRET);
@@ -99,11 +99,11 @@ public class TokenServiceImpl implements TokenService{
             String role = claims.get("authorities").toString();
             result.put("uId", uId);
             result.put("role", role);
-            result.put("message", "ok");
+            result.put("message", 0);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            result.put("message", "token已过期");
+            result.put("message", 1);
         } catch (io.jsonwebtoken.SignatureException e) {
-            result.put("message", "token无效");
+            result.put("message", 1);
         }
         return result;
     }

@@ -1,4 +1,4 @@
-package com.mosaiker.userservice.service;
+/*package com.mosaiker.userservice.service;
 
 import com.mosaiker.userservice.entity.User;
 import com.mosaiker.userservice.repository.UserRepository;
@@ -67,4 +67,4 @@ public class UserServiceImplTest {
         addUserTrue.setuId(10002L);
         Assert.assertEquals(addUserTrue, userService.updateUser(addUserTrue));
     }
-}
+}*/

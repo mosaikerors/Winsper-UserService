@@ -17,7 +17,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account findAccountByUId(Long uId) {
-        return null;
+        return accountRepository.findAccountByUId(uId);
     }
 
     @Override
@@ -31,7 +31,57 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String changeAvatar(String newAvatarUrl) {
-        return null;
+    public Integer toggleMessage(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setMessagePublic(isPublic);
+        return 0;
+    }
+    @Override
+    public Integer toggleHean(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setHeanPublic(isPublic);
+        return 0;
+    }
+    @Override
+    public Integer toggleCollection(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setCollectionPublic(isPublic);
+        accountRepository.save(user);
+        return 0;
+    }
+    @Override
+    public Integer toggleDiary(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setDiaryPublic(isPublic);
+        accountRepository.save(user);
+        return 0;
+    }
+    @Override
+    public Integer toggleJournal(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setJournalPublic(isPublic);
+        accountRepository.save(user);
+        return 0;
+    }
+    @Override
+    public Integer toggleSubmission(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setSubmissionPublic(isPublic);
+        accountRepository.save(user);
+        return 0;
+    }
+    @Override
+    public Integer toggleMood(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setMoodReportPublic(isPublic);
+        accountRepository.save(user);
+        return 0;
+    }
+    @Override
+    public Integer toggleComment(Boolean isPublic,Long uId){
+        Account user = accountRepository.findAccountByUId(uId);
+        user.setCommentPublic(isPublic);
+        accountRepository.save(user);
+        return 0;
     }
 }
