@@ -37,6 +37,7 @@ steps:
       script:
         - cd /root/test/Winsper/winsper-user/target
         - cp ../Dockerfile .
+        - docker rm -f deeell-test/winsper-user
         - docker build -t deeell-test/winsper-user .
 
 
