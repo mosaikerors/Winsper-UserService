@@ -22,7 +22,7 @@ steps:
       key:
         from_secret: private_key
       rm: true
-      target: /Winsper/winsper-user
+      target: /root/test/Winsper/winsper-user
       source:
         - target/user-service-0.0.1-SNAPSHOT.jar
         - Dockerfile
@@ -35,7 +35,7 @@ steps:
       key:
         from_secret: private_key
       script:
-        - cd /root/test/drone-tmp/target
+        - cd /root/test/Winsper/winsper-user/target
         - cp ../Dockerfile .
         - docker build -t deeell-test/winsper-user .
 
