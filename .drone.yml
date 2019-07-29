@@ -39,6 +39,8 @@ steps:
         - cp ../Dockerfile .
         - docker rm -f deeell-test/winsper-user
         - docker build -t deeell-test/winsper-user .
+        - docker login
+        - docker push deeell-test/winsper-user
 
 
 
