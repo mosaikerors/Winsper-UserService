@@ -39,7 +39,10 @@ steps:
         - cd /root/test/Winsper/winsper-user/target
         - cp ../Dockerfile .
         - docker rm -f deeell-test/winsper-user
-        - docker build -t deeell-test/winsper-user .
+        - docker rm -f gusabary/winsper-user
+        - docker build -t gusabary/winsper-user .
+        - docker login
+        - docker push gusabary/winsper-user
         
 
 
