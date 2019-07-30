@@ -19,9 +19,9 @@ public class AccountController {
     private UserService userService;
 
     @RequestMapping(value = "/update/avatar", method = RequestMethod.PUT)
-    public JSONObject updateAvatar(@RequestBody JSONObject request) {
+    public JSONObject updateAvatar(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
         JSONObject result = new JSONObject();
-        Account account = accountService.findAccountByUId(request.getLong("uId"));
+        Account account = accountService.findAccountByUId(uId);
         if (account == null) {
             result.put("rescode", 1);//该uid不存在
             return result;
@@ -33,9 +33,9 @@ public class AccountController {
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.PUT)
-    public JSONObject checkIn(@RequestBody JSONObject request) {
+    public JSONObject checkIn( @RequestHeader("uId") Long uId) {
         JSONObject result = new JSONObject();
-        Account account = accountService.findAccountByUId(request.getLong("uId"));
+        Account account = accountService.findAccountByUId(uId);
         if (account == null) {
             result.put("rescode", 1);//该uid不存在
             return result;
@@ -54,9 +54,9 @@ public class AccountController {
     }
 
     @RequestMapping(value = "/follow", method = RequestMethod.POST)
-    public JSONObject follow(@RequestBody JSONObject request) {
+    public JSONObject follow(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
         JSONObject result = new JSONObject();
-        Account account = accountService.findAccountByUId(request.getLong("uId"));
+        Account account = accountService.findAccountByUId(uId);
         Account targetAccount = accountService.findAccountByUId(request.getLong("targetUId"));
         if (account == null || targetAccount == null) {
             result.put("rescode", 1);//双方至少有一方uid不存在
@@ -74,8 +74,8 @@ public class AccountController {
         return result;
     }
 
-    @RequestMapping(value = "/info/me/{uId}", method = RequestMethod.GET)
-    public JSONObject getMyInfo(@PathVariable Long uId) {
+    @RequestMapping(value = "/info/me", method = RequestMethod.GET)
+    public JSONObject getMyInfo(@RequestHeader("uId") Long uId) {
         JSONObject result;
         Account account = accountService.findAccountByUId(uId);
         if (account == null) {
@@ -109,9 +109,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/message", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isMessage(@RequestBody JSONObject request) {
+  public JSONObject isMessage(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleMessage(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -120,9 +119,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/hean", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isHean(@RequestBody JSONObject request) {
+  public JSONObject isHean(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleHean(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -131,9 +129,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/collection", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isCollection(@RequestBody JSONObject request) {
+  public JSONObject isCollection(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleCollection(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -142,9 +139,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/diary", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isDiary(@RequestBody JSONObject request) {
+  public JSONObject isDiary(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleDiary(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -153,9 +149,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/journal", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isJournal(@RequestBody JSONObject request) {
+  public JSONObject isJournal(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleJournal(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -164,9 +159,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/submission", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isSubmission(@RequestBody JSONObject request) {
+  public JSONObject isSubmission(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleSubmission(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -175,9 +169,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/moodReport", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isMood(@RequestBody JSONObject request) {
+  public JSONObject isMood(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleMood(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -186,9 +179,8 @@ public class AccountController {
 
   @RequestMapping(value = "/privacy/comment", method = RequestMethod.PUT)
   @ResponseBody
-  public JSONObject isComment(@RequestBody JSONObject request) {
+  public JSONObject isComment(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     Boolean isPublic=request.getBoolean("toBePublic");
-    Long uId = request.getLong("uId");
     Integer msg=accountService.toggleComment(isPublic,uId);
     JSONObject result = new JSONObject();
     result.put("rescode",msg);
@@ -197,7 +189,7 @@ public class AccountController {
 
   @RequestMapping(value = "/getFollowings", method = RequestMethod.GET)
   @ResponseBody
-  public JSONObject getFollowings(@RequestParam Long uId) {
+  public JSONObject getFollowings(@RequestHeader("uId") Long uId) {
     Account account = accountService.findAccountByUId(uId);
     JSONObject result = new JSONObject();
     result.put("following",account.getFollowing());
@@ -206,7 +198,7 @@ public class AccountController {
 
   @RequestMapping(value = "/getFollowers", method = RequestMethod.GET)
   @ResponseBody
-  public JSONObject getFollowers(@RequestParam Long uId) {
+  public JSONObject getFollowers(@RequestHeader("uId") Long uId) {
     Account account = accountService.findAccountByUId(uId);
     JSONObject result = new JSONObject();
     result.put("follower",account.getFollower());
