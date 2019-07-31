@@ -197,4 +197,10 @@ public class Account {
     info.put("isCommentPublic", this.isCommentPublic);
     return info;
   }
+
+  public List<Long> getMutualFollows(){
+    List<Long> mutual = this.following;
+    mutual.retainAll(this.follower);
+    return mutual;
+  }
 }

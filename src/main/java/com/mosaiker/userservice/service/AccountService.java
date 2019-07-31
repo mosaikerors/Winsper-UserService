@@ -11,7 +11,6 @@ public interface AccountService {
 
     String checkIn(Long uId);
 
-
     Integer toggleMessage(Boolean isPublic,Long uId);
 
     Integer toggleHean(Boolean isPublic,Long uId);

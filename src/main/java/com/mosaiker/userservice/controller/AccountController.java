@@ -1,8 +1,10 @@
 package com.mosaiker.userservice.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.Account;
 import com.mosaiker.userservice.entity.User;
+import com.mosaiker.userservice.repository.UserRepository;
 import com.mosaiker.userservice.service.AccountService;
 import com.mosaiker.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,31 @@ public class AccountController {
         result.put("rescode", 0);
         return result;
     }
+
+  @RequestMapping(value = "/unfollow", method = RequestMethod.POST)
+  public JSONObject unfollow(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
+    JSONObject result = new JSONObject();
+    Account account = accountService.findAccountByUId(uId);
+    Account targetAccount = accountService.findAccountByUId(request.getLong("targetUId"));
+    if (account == null || targetAccount == null) {
+      result.put("rescode", 1);//双方至少有一方uid不存在
+      return result;
+    }
+    List<Long> following = account.getFollowing();
+    List<Long> targetFollower = targetAccount.getFollower();
+    if(!following.contains(targetAccount.getuId())){
+      result.put("rescode", 3);//未关注此人
+      return result;
+    }
+    following.remove(targetAccount.getuId());
+    targetFollower.remove(account.getuId());
+    account.setFollowing(following);
+    targetAccount.setFollower(targetFollower);
+    accountService.updateAccount(account);
+    accountService.updateAccount(targetAccount);
+    result.put("rescode", 0);
+    return result;
+  }
 
     @RequestMapping(value = "/info/me", method = RequestMethod.GET)
     public JSONObject getMyInfo(@RequestHeader("uId") Long uId) {
@@ -187,21 +214,50 @@ public class AccountController {
     return result;
   }
 
-  @RequestMapping(value = "/getFollowings", method = RequestMethod.GET)
+  @RequestMapping(value = "/followlist/followings", method = RequestMethod.GET)
   @ResponseBody
   public JSONObject getFollowings(@RequestHeader("uId") Long uId) {
     Account account = accountService.findAccountByUId(uId);
     JSONObject result = new JSONObject();
-    result.put("following",account.getFollowing());
+    result.put("rescode",0);
+    result.put("followlist",toFollowlist(account.getFollowing(),uId));
     return result;
   }
 
-  @RequestMapping(value = "/getFollowers", method = RequestMethod.GET)
+  @RequestMapping(value = "/followlist/followers", method = RequestMethod.GET)
   @ResponseBody
   public JSONObject getFollowers(@RequestHeader("uId") Long uId) {
     Account account = accountService.findAccountByUId(uId);
     JSONObject result = new JSONObject();
-    result.put("follower",account.getFollower());
+    result.put("rescode",0);
+    result.put("followlist",toFollowlist(account.getFollower(),uId));
     return result;
   }
+
+  @RequestMapping(value = "/followlist/mutual", method = RequestMethod.GET)
+  @ResponseBody
+  public JSONObject getMutualFollows(@RequestHeader("uId") Long uId) {
+    Account account = accountService.findAccountByUId(uId);
+    JSONObject result = new JSONObject();
+    result.put("rescode",0);
+    result.put("followlist",toFollowlist(account.getMutualFollows(),uId));
+    return result;
+  }
+
+  private JSONArray toFollowlist(List<Long> list,Long uId){
+      JSONArray jsonList = new JSONArray();
+      for(Long one: list){
+        JSONObject oneFollow = new JSONObject();
+        oneFollow.put("uId",one);
+        Account found = accountService.findAccountByUId(one);
+        oneFollow.put("username", userService.findUserByUId(one).getUsername());
+        oneFollow.put("avatar",found.getAvatarUrl());
+        oneFollow.put("isMutualFollow",found.getMutualFollows().contains(uId));
+        jsonList.add(oneFollow);
+      }
+      return jsonList;
+  }
+
+
+
 }
