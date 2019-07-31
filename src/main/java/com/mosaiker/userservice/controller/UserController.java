@@ -73,7 +73,7 @@ public class UserController {
    * token是用uId构建的
    * */
   @RequestMapping(value = "/login", method = RequestMethod.POST)
-  public JSONObject login(@RequestBody JSONObject request,@RequestHeader("uId") Long uId) {//header!!!
+  public JSONObject login(@RequestBody JSONObject request) {
     JSONObject result = new JSONObject();
     //第一次登录，不含token字段
     String token = request.getString("token");
@@ -101,6 +101,7 @@ public class UserController {
     } else {
       //后续登录，只含token字段和uId字段
       //解析并验证token，检查token是否过期，密码改变和状态被禁用都会使token失效
+      Long uId = request.getLong("uId");
       JSONObject userInfo = tokenService.parseToken(token, uId);
       if (!userInfo.getInteger("message").equals(0)) {
         result.put("rescode", userInfo.getInteger("message"));
