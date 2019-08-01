@@ -14,7 +14,7 @@ public class Account {
   @Id
   private Long uId;
   private String avatarUrl;
-  private long feather;
+  private Integer feather;
   @ElementCollection
   private List<Long> follower;
   @ElementCollection
@@ -65,11 +65,11 @@ public class Account {
     this.avatarUrl = avatarUrl;
   }
 
-  public long getFeather() {
+  public Integer getFeather() {
     return feather;
   }
 
-  public void setFeather(long feather) {
+  public void setFeather(Integer feather) {
     this.feather = feather;
   }
 
@@ -167,7 +167,7 @@ public class Account {
     info.put("uId",this.uId);
     info.put("avater", this.avatarUrl);
     info.put("feather", this.feather);
-    List<Long> mutual = this.following;
+    List<Long> mutual = new ArrayList<>(this.following);
     mutual.retainAll(this.follower);
     info.put("mutualFollow", mutual.size());
     info.put("following", this.following.size());
@@ -199,8 +199,9 @@ public class Account {
   }
 
   public List<Long> getMutualFollows(){
-    List<Long> mutual = this.following;
+    List<Long> mutual = new ArrayList<>(this.following);
     mutual.retainAll(this.follower);
+
     return mutual;
   }
 }

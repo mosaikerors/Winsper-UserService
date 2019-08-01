@@ -9,7 +9,7 @@ public interface AccountService {
 
     Account updateAccount(Account account);
 
-    String checkIn(Long uId);
+//    String checkIn(Long uId);
 
     Integer toggleMessage(Boolean isPublic,Long uId);
 

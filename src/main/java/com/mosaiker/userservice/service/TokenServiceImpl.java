@@ -19,9 +19,9 @@ public class TokenServiceImpl implements TokenService{
     @Autowired
     private UserRepository userRepository;
 
-    static final long DEFAULT_EXPIRATION_TIME = 15 * 24 * 60 * 60 * 1000;      //15天
-    static final String COMMON_SECRET = "MosA1kER5738h";            //JWT密码
-    static final String TOKEN_PREFIX = "Bearer ";        //Token前缀
+    private static final long DEFAULT_EXPIRATION_TIME = 15 * 24 * 60 * 60 * 1000;      //15天
+    private static final String COMMON_SECRET = "MosA1kER5738h";            //JWT密码
+    private static final String TOKEN_PREFIX = "Bearer ";        //Token前缀
 
     @Override
     public String createToken(Long uId, String role, Long expiration_time) {
@@ -109,23 +109,11 @@ public class TokenServiceImpl implements TokenService{
     }
 
     @Override
-    public boolean verifyTokenRoleIs(String token, Long uId, String role) {
-        // 解析 Token
-        JSONObject userInfo = parseToken(token, uId);
-        if (!userInfo.getString("message").equals("ok")) {
-            //token已过期
-            return false;
-        }
-        // 要求的身份和 token 中含有的身份信息匹配，返回 true
-        return role.equals(userInfo.get("role"));
-    }
-
-    @Override
     public boolean verifyTokenRoleHave(String token, Long uId, List<String> roleArray) {
         // 解析 Token
         JSONObject userInfo = parseToken(token, uId);
         System.out.println(userInfo);
-        if (!userInfo.getString("message").equals("ok")) {
+        if (!userInfo.getInteger("message").equals(0)) {
             //token已过期
             System.out.println("token expire");
             return false;
