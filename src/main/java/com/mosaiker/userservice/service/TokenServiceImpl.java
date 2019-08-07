@@ -44,33 +44,33 @@ public class TokenServiceImpl implements TokenService{
     public String createCodeToken(String phone, String code, Long expiration_time) {
         return Jwts.builder()
                 // 保存验证码
-                .claim("code", code)
+                .claim("phone", phone)
                 // 有效期设置
                 .setExpiration(new Date(System.currentTimeMillis() + expiration_time))
-                // 签名设置,用phone作为密码来加密
-                .signWith(SignatureAlgorithm.HS512, phone)
+                // 签名设置,用code作为密码来加密
+                .signWith(SignatureAlgorithm.HS512, code)
                 .compact();
     }
 
     @Override
-    public String verifyCodeToken(String token, String phone, String code) {
+    public Integer verifyCodeToken(String token, String phone, String code) {
         try {
             Claims claims = Jwts.parser()
                     // 验签
-                    .setSigningKey(phone)
+                    .setSigningKey(code)
                     // 去掉 Bearer
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .getBody();
-            String expectCode = claims.get("code").toString();
-            if (expectCode.equals(code)) {
-                return "ok";
+            String expectPhone = claims.get("phone").toString();
+            if (expectPhone.equals(phone)) {
+                return 0;
             } else {
-                return "验证码不正确";
+                return 4;
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            return "验证码已过期";
+            return 1;
         } catch (io.jsonwebtoken.SignatureException e) {
-            return "前后手机号不一致";
+            return 4;
         }
     }
 
@@ -84,7 +84,7 @@ public class TokenServiceImpl implements TokenService{
         JSONObject result = new JSONObject();
         User user = userRepository.findUserByUId(uId);
         if (user == null) {
-            result.put("message", "用户id不存在");
+            result.put("message", 1);
             return result;
         }
         String secret = Utils.getFullSecret(user.getPassword(), user.getStatus(), COMMON_SECRET);
@@ -99,11 +99,11 @@ public class TokenServiceImpl implements TokenService{
             String role = claims.get("authorities").toString();
             result.put("uId", uId);
             result.put("role", role);
-            result.put("message", "ok");
+            result.put("message", 0);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            result.put("message", "token已过期");
+            result.put("message", 1);
         } catch (io.jsonwebtoken.SignatureException e) {
-            result.put("message", "token无效");
+            result.put("message", 1);
         }
         return result;
     }
@@ -124,8 +124,10 @@ public class TokenServiceImpl implements TokenService{
     public boolean verifyTokenRoleHave(String token, Long uId, List<String> roleArray) {
         // 解析 Token
         JSONObject userInfo = parseToken(token, uId);
+        System.out.println(userInfo);
         if (!userInfo.getString("message").equals("ok")) {
             //token已过期
+            System.out.println("token expire");
             return false;
         }
         // 要求的身份和 token 中含有的身份信息匹配，返回 true

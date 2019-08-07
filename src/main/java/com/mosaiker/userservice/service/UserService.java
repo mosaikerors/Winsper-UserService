@@ -10,7 +10,7 @@ public interface UserService {
 
     String sendCode(String phone, String code);
 
-    String addUser(String username, String phone, String password);
+    Integer addUser(String username, String phone, String password);
 
     User findUserByPhoneAndPassword(String phone, String password);
 

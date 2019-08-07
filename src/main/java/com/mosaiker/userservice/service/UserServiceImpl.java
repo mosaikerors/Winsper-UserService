@@ -3,7 +3,6 @@ package com.mosaiker.userservice.service;
 import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.User;
 import com.mosaiker.userservice.repository.UserRepository;
-import com.mosaiker.userservice.utils.Utils;
 import com.zhenzi.sms.ZhenziSmsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,12 +40,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addUser(String name, String phone, String password) {
+    public Integer addUser(String name, String phone, String password) {
         if (userRepository.existsUserByPhone(phone))
-            return "该手机号已被注册";
+            return 3;
         User user = new User(name, password, phone, 1);
         userRepository.save(user);
-        return "ok";
+        return 0;
     }
 
 
