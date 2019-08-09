@@ -12,69 +12,38 @@ steps:
     commands:
       - mvn clean
       - mvn package -Dmaven.test.skip=true
-      - echo "test and package user-service completed 🙂🙂🙂"
+      - echo "test and package zuul completed 🙂🙂🙂"
 
-  - name: upload_master
+  - name: upload
     image: appleboy/drone-scp
     settings:
-      host: 10.0.0.98
+      host: 10.0.0.41
       username: root
       key:
         from_secret: private_key
       rm: true
-      target: /Winsper/winsper-user
+      target: ~/tbc/drone/tmp
       source:
         - target/user-service-0.0.1-SNAPSHOT.jar
         - Dockerfile
 
-  - name: make_image_and_copy
+  - name: deploy
     image: appleboy/drone-ssh
     settings:
-      host: 10.0.0.98
+      host: 10.0.0.41
       username: root
+      key:
+        from_secret: private_key
+      command_timeout: 5m
       script:
-        - cd /Winsper/winsper-user/target
+        - cd ~/tbc/drone/tmp/target
         - cp ../Dockerfile .
-        - docker build -t winsper-user .
-        - docker save winsper-user>winsper-user.tar
-        - scp winsper-user.tar root@10.0.0.106:/root/Winsper/winsper-user
-        - scp winsper-user.tar root@10.0.0.39:/root/Winsper/winsper-user
-        - scp winsper-user.tar root@10.0.0.99:/root/Winsper/winsper-user
-
-  - name: deploy_slave1
-    image: appleboy/drone-ssh
-    settings:
-      host: 10.0.0.106
-      username: root
-      script:
-        - cd /Winsper/winsper-user
-        - docker load -i winsper-user.tar
-        - docker rm -f winsper-user-c
-        - docker run -d --name winsper-user-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=10.0.0.106" -e "SERVER_PORT=7180" winsper-user
-
-  - name: deploy_slave2
-    image: appleboy/drone-ssh
-    settings:
-      host: 10.0.0.39
-      username: root
-      script:
-        - cd /Winsper/winsper-user
-        - docker load -i winsper-user.tar
-        - docker rm -f winsper-user-c
-        - docker run -d --name winsper-user-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=10.0.0.39" -e "SERVER_PORT=7180" winsper-user
-
-  - name: deploy_slave3
-    image: appleboy/drone-ssh
-    settings:
-      host: 10.0.0.99
-      username: root
-      script:
-        - cd /Winsper/winsper-user
-        - docker load -i winsper-user.tar
-        - docker rm -f winsper-user-c
-        - docker run -d --name winsper-user-c --expose=7180 -p 7180:7180 -e "EUREKA_INSTANCE_IP-ADDRESS=10.0.0.99" -e "SERVER_PORT=7180" winsper-user
-
-
+        - docker build -t gusabary/winsper-user .
+        - docker login
+        - docker push gusabary/winsper-user
+        - cd ~/tbc/Winsper
+        - kubectl delete deploy/winsper-user
+        - kubectl apply -f user-deployment.yml
 
 
 volumes:
