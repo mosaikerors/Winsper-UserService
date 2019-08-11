@@ -15,6 +15,7 @@ public class Account {
   private Long uId;
   private String avatarUrl;
   private Integer feather;
+  
   @ElementCollection
   private List<Long> follower;
   @ElementCollection
@@ -201,7 +202,6 @@ public class Account {
   public List<Long> getMutualFollows(){
     List<Long> mutual = new ArrayList<>(this.following);
     mutual.retainAll(this.follower);
-
     return mutual;
   }
 }

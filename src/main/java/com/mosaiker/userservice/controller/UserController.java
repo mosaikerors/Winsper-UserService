@@ -137,7 +137,6 @@ public class UserController {
     return result;
   }
 
-
   @RequestMapping(value = "/getSimpleInfo", method = RequestMethod.GET)
   public JSONObject getSimpleInfo(@RequestHeader("uId") Long uId) {
     JSONObject result = new JSONObject();

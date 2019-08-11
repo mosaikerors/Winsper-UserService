@@ -261,6 +261,4 @@ public class AccountController {
     }
     return jsonList;
   }
-
-
 }
