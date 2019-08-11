@@ -86,10 +86,10 @@ public class UserController {
           result.put("rescode", 3);
           return result;
         }
-        Long uId = user.getuId();
-        Account account = accountService.findAccountByUId(uId);
+        Long uIdgot = user.getuId();
+        Account account = accountService.findAccountByUId(uIdgot);
         result = account.toJSONObject();
-        String newToken = tokenService.createToken(uId, role);
+        String newToken = tokenService.createToken(uIdgot, role);
         result.put("rescode", 0);
         result.put("token", newToken);
         result.put("username", user.getUsername());
@@ -101,35 +101,32 @@ public class UserController {
     } else {
       //后续登录，只含token字段和uId字段
       //解析并验证token，检查token是否过期，密码改变和状态被禁用都会使token失效
-      JSONObject userInfo = tokenService.parseToken(token, request.getLong("uId"));
+      Long uId = request.getLong("uId");
+      JSONObject userInfo = tokenService.parseToken(token, uId);
       if (!userInfo.getInteger("message").equals(0)) {
         result.put("rescode", userInfo.getInteger("message"));
         return result;
       }
       //该token有效，获取token对应用户，该用户状态正常，密码没变
-      User user = userService.findUserByUId(request.getLong("uId"));
+      User user = userService.findUserByUId(uId);
       //根据该用户当前最新状态更新token
       String role = Utils.statusToRole(user.getStatus());
-      if (role.equals("BANNED")) {
-        result.put("rescode", 3);
-        return result;
-      } else {
-        Account account = accountService.findAccountByUId(request.getLong("uId"));
-        result = account.toJSONObject();
-        String newToken = tokenService.createToken(userInfo.getLong("uId"), role);
-        result.put("rescode", 0);
-        result.put("token", newToken);
-        result.put("username", user.getUsername());
-        result.put("status", user.getStatus());
-        return result;
-      }
-    }
-  }
+      Account account = accountService.findAccountByUId(uId);
+      result = account.toJSONObject();
+      String newToken = tokenService.createToken(uId, role);
+      result.put("rescode", 0);
+      result.put("token", newToken);
+      result.put("username", user.getUsername());
+      result.put("status", user.getStatus());
+      return result; } }
 
+  /*
+   * 更新username
+   * */
   @RequestMapping(value = "/update/username", method = RequestMethod.PUT)
-  public JSONObject updateInfo(@RequestBody JSONObject request) {
+  public JSONObject updateInfo(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     JSONObject result = new JSONObject();
-    User user = userService.findUserByUId(request.getLong("uId"));
+    User user = userService.findUserByUId(uId);
     if (user == null) {
       result.put("rescode", 1);//该uId不存在
       return result;
@@ -140,40 +137,13 @@ public class UserController {
     return result;
   }
 
-  /*
-   * {"uId":10000,"token":"efwfsef.fefesf.efsefsef","roles":["USER","SUPERUSER"]}
-   * the roles can be empty:
-   * {"uId":10000,"token":"efwfsef.fefesf.efsefsef","roles":[]}
-   * */
-  @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-  public JSONObject anthenticate(@RequestBody JSONObject request) {
-    JSONObject result = new JSONObject();
-    String token = request.getString("token");
-    List<String> roleArray = request.getJSONArray("roles").toJavaList(String.class);
-    System.out.println(token);
-    System.out.println(request.getLong("uId"));
-    System.out.println(roleArray);
-    if (token == null || !tokenService
-        .verifyTokenRoleHave(token, request.getLong("uId"), roleArray)) {
-      result.put("rescode", 2);  //抱歉，你没有这个权限
-      return result;
-    }
-    User user = userService.findUserByUId(request.getLong("uId"));
-    if (user == null) {
-      result.put("rescode", 2);  //该用户id不存在
-      return result;
-    }
-    result.put("rescode", 0);
-    return result;
-  }
-
   @RequestMapping(value = "/getSimpleInfo", method = RequestMethod.GET)
-  public JSONObject getSimpleInfo(@RequestParam Long uId) {
+  public JSONObject getSimpleInfo(@RequestHeader("uId") Long uId) {
     JSONObject result = new JSONObject();
     User user = userService.findUserByUId(uId);
     Account account = accountService.findAccountByUId(uId);
     if (user == null || account == null) {
-      result.put("message", "ainfo1");
+      result.put("rescode", 1);
       return result;
     }
     result.put("rescode", 0);

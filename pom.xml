@@ -20,31 +20,6 @@
         <docker.image.prefix>springboot</docker.image.prefix>
     </properties>
 
-     <repositories>
-    <repository>
-      <id>ali-maven</id>
-      <url>http://maven.aliyun.com/nexus/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-        <checksumPolicy>fail</checksumPolicy>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>central</id>
-      <name>Maven Repository Switchboard</name>
-      <layout>default</layout>
-      <url>http://repo1.maven.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-     
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,6 +87,7 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -126,6 +102,7 @@
         </dependencies>
     </dependencyManagement>
     
+
 
     <build>
         <plugins>

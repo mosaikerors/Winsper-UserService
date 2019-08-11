@@ -3,17 +3,19 @@ package com.mosaiker.userservice.entity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
 public class User {
+    @GeneratedValue
     private long uId;
     private String username;
     private String password;
     private String phone;
     private int status;  //status: 0 - 被禁用， 1 - 普通用户， 2 - 会员
 
-    private int isOpen;
     public User() {
 
     }
@@ -50,6 +52,7 @@ public class User {
     public void setIsOpen(int isOpen) {
         this.isOpen = isOpen;
     }
+
 
     @Basic
     @Column(name = "username", nullable = false, length = 32)

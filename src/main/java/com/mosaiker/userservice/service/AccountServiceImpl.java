@@ -25,10 +25,6 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.save(account);
     }
 
-    @Override
-    public String checkIn(Long uId) {
-        return null;
-    }
 
     @Override
     public Integer toggleMessage(Boolean isPublic,Long uId){
@@ -84,4 +80,6 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.save(user);
         return 0;
     }
+
+
 }
