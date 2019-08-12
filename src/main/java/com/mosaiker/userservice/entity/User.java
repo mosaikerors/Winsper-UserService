@@ -15,6 +15,7 @@ public class User {
     private String password;
     private String phone;
     private int status;  //status: 0 - 被禁用， 1 - 普通用户， 2 - 会员
+    private int isOpen;
 
     public User() {
 
