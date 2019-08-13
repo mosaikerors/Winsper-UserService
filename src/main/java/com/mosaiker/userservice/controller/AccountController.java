@@ -21,7 +21,7 @@ public class AccountController {
   @Autowired
   private UserService userService;
 
-  @RequestMapping(value = "/update/avatar", method = RequestMethod.PUT)
+  @RequestMapping(value = "/avatar/update", method = RequestMethod.PUT)
   public JSONObject updateAvatar(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     JSONObject result = new JSONObject();
     Account account = accountService.findAccountByUId(uId);

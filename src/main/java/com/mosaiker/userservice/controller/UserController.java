@@ -118,12 +118,14 @@ public class UserController {
       result.put("token", newToken);
       result.put("username", user.getUsername());
       result.put("status", user.getStatus());
-      return result; } }
+      return result;
+    }
+  }
 
   /*
    * 更新username
    * */
-  @RequestMapping(value = "/update/username", method = RequestMethod.PUT)
+  @RequestMapping(value = "/username/update", method = RequestMethod.PUT)
   public JSONObject updateInfo(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
     JSONObject result = new JSONObject();
     User user = userService.findUserByUId(uId);
@@ -152,5 +154,23 @@ public class UserController {
     result.put("isHeanPublic", account.getHeanPublic());
     result.put("isCollectionPublic", account.getCollectionPublic());
     return result;
+  }
+
+  @RequestMapping(value = "/password/update", method = RequestMethod.POST)
+  public JSONObject updatePassword(@RequestBody JSONObject request) {
+    String token = request.getString("token");
+    String phone = request.getString("phone");
+    JSONObject result = new JSONObject();
+    Integer msg = tokenService.verifyCodeToken(token, phone, request.getString("code"));
+    if (msg == 0) {
+      User user = userService.findUserByPhone("phone");
+      user.setPassword(request.getString("password"));
+      userService.updateUser(user);
+      result.put("rescode", 0);
+      return result;
+    } else {
+      result.put("rescode", msg);
+      return result;
+    }
   }
 }
