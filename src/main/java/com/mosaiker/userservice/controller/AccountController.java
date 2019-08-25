@@ -122,8 +122,8 @@ public class AccountController {
     return result;
   }
 
-  @RequestMapping(value = "/info/{uId}", method = RequestMethod.GET)
-  public JSONObject getAccountInfo(@PathVariable Long uId) {
+  @RequestMapping(value = "/info", method = RequestMethod.GET)
+  public JSONObject getAccountInfo(@RequestParam Long uId) {
     JSONObject result;
     Account account = accountService.findAccountByUId(uId);
     if (account == null) {
