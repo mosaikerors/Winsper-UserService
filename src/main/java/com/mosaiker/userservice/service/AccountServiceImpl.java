@@ -30,12 +30,14 @@ public class AccountServiceImpl implements AccountService {
     public Integer toggleMessage(Boolean isPublic,Long uId){
         Account user = accountRepository.findAccountByUId(uId);
         user.setMessagePublic(isPublic);
+        accountRepository.save(user);
         return 0;
     }
     @Override
     public Integer toggleHean(Boolean isPublic,Long uId){
         Account user = accountRepository.findAccountByUId(uId);
         user.setHeanPublic(isPublic);
+        accountRepository.save(user);
         return 0;
     }
     @Override
