@@ -156,8 +156,8 @@ public class UserController {
     return result;
   }
 
-  @RequestMapping(value = "/password/update", method = RequestMethod.POST)
-  public JSONObject updatePassword(@RequestBody JSONObject request) {
+  @RequestMapping(value = "/forget/update", method = RequestMethod.POST)
+  public JSONObject forgetPassword(@RequestBody JSONObject request) {
     String token = request.getString("token");
     String phone = request.getString("phone");
     JSONObject result = new JSONObject();
@@ -172,5 +172,37 @@ public class UserController {
       result.put("rescode", msg);
       return result;
     }
+  }
+
+  @RequestMapping(value = "/forget/sendCode", method = RequestMethod.POST)
+  public JSONObject forgetSendCode(@RequestBody JSONObject request) {
+    String phone = request.getString("phone");
+    JSONObject result = new JSONObject();
+    if (userService.findUserByPhone(phone) == null) {
+      result.put("rescode", 3);  //该手机号不存在！
+      return result;
+    }
+    String code = Utils.randomNumber(6);
+    if (userService.sendCode(phone, code).equals("fail")) {
+      result.put("rescode", 4);  //发送验证码失败，请稍后重试
+      return result;
+    }
+    String token = tokenService.createCodeToken(phone, code, 5 * 60 * 1000L);
+    result.put("rescode", 0);
+    result.put("token", token);
+    return result;
+  }
+
+  @RequestMapping(value = "/password/update", method = RequestMethod.PUT)
+  public JSONObject updatePassword(@RequestBody JSONObject request, @RequestHeader("uId") Long uId) {
+    String password = request.getString("password");
+    JSONObject result = new JSONObject();
+    User user = userService.findUserByUId(uId);
+    user.setPassword(password);
+    String newToken = tokenService.createToken(uId, Utils.statusToRole(user.getStatus()));
+    result.put("rescode", 0);
+    result.put("token", newToken);
+    return result;
+
   }
 }
