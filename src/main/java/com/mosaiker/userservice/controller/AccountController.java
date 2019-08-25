@@ -70,6 +70,10 @@ public class AccountController {
     }
     List<Long> following = account.getFollowing();
     List<Long> targetFollower = targetAccount.getFollower();
+    if (following.contains(targetAccount.getuId())) {
+      result.put("rescode", 3);
+      return result;
+    }
     following.add(targetAccount.getuId());
     targetFollower.add(account.getuId());
     account.setFollowing(following);
