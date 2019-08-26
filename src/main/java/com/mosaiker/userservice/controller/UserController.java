@@ -149,6 +149,7 @@ public class UserController {
       return result;
     }
     result.put("rescode", 0);
+    result.put("uId", uId);
     result.put("avatarUrl", account.getAvatarUrl());
     result.put("username", user.getUsername());
     result.put("isHeanPublic", account.getHeanPublic());
