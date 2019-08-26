@@ -127,7 +127,7 @@ public class AccountController {
   }
 
   @RequestMapping(value = "/info", method = RequestMethod.GET)
-  public JSONObject getAccountInfo(@RequestParam Long uId) {
+  public JSONObject getAccountInfo(@RequestParam Long uId, @RequestHeader("uId") Long viewer) {
     JSONObject result;
     Account account = accountService.findAccountByUId(uId);
     if (account == null) {
@@ -136,7 +136,7 @@ public class AccountController {
       return result;
     }
     User me = userService.findUserByUId(uId);
-    result = account.toViewedJSONObject();
+    result = account.toViewedJSONObject(viewer);
     result.put("username", me.getUsername());
     result.put("rescode", 0);
     return result;

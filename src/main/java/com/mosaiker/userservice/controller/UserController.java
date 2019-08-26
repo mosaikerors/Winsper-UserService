@@ -200,6 +200,7 @@ public class UserController {
     User user = userService.findUserByUId(uId);
     user.setPassword(password);
     String newToken = tokenService.createToken(uId, Utils.statusToRole(user.getStatus()));
+    userService.updateUser(user);
     result.put("rescode", 0);
     result.put("token", newToken);
     return result;

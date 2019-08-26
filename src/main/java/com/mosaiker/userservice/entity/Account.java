@@ -185,9 +185,10 @@ public class Account {
     return info;
   }
 
-  public JSONObject toViewedJSONObject() {
+  public JSONObject toViewedJSONObject(Long uId) {
     JSONObject info = this.toJSONObject();
-
+    info.remove("hasChecked");
+    info.put("hasFollowed", ((ArrayList<Long>) info.get("followers")).contains(uId));
     info.put("isMessagePublic", this.isMessagePublic);
     info.put("isHeanPublic", this.isHeanPublic);
     info.put("isCollectionPublic", this.isCollectionPublic);
