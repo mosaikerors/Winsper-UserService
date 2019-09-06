@@ -126,6 +126,17 @@ public class AccountControllerTest {
       put("targetUId", 1L);
     }}, 2L)));
 
+
+
+    when(accountService.updateAccount(account1)).thenReturn(account1);
+    when(accountService.updateAccount(account3)).thenReturn(account3);
+
+    assertTrue(MyJSONUtil.compareTwoJSONObject(new JSONObject() {{
+      put("rescode", 0);
+    }}, accountController.follow(new JSONObject() {{
+      put("targetUId", 3L);
+    }}, 1L)));
+
     List<Long> following = account1.getFollowing();
     List<Long> follower = account3.getFollower();
     following.add(3L);
@@ -133,11 +144,8 @@ public class AccountControllerTest {
     account1.setFollowing(following);
     account3.setFollower(follower);
 
-    when(accountService.updateAccount(account1)).thenReturn(account1);
-    when(accountService.updateAccount(account3)).thenReturn(account3);
-
     assertTrue(MyJSONUtil.compareTwoJSONObject(new JSONObject() {{
-      put("rescode", 0);
+      put("rescode", 3);
     }}, accountController.follow(new JSONObject() {{
       put("targetUId", 3L);
     }}, 1L)));
@@ -217,15 +225,15 @@ public class AccountControllerTest {
     when(accountService.findAccountByUId(2L)).thenReturn(null);
     assertTrue(MyJSONUtil.compareTwoJSONObject(new JSONObject() {{
       put("rescode", 1);
-    }}, accountController.getAccountInfo(2L)));
+    }}, accountController.getAccountInfo(2L,2L)));
 
     Account account1 = new Account(1L);
     when(accountService.findAccountByUId(1L)).thenReturn(account1);
     when(userService.findUserByUId(1L)).thenReturn(user1);
-    JSONObject expect = account1.toViewedJSONObject();
+    JSONObject expect = account1.toViewedJSONObject(2L);
     expect.put("rescode", 0);
     expect.put("username", "test");
-    assertTrue(MyJSONUtil.compareTwoJSONObject(expect, accountController.getAccountInfo(1L)));
+    assertTrue(MyJSONUtil.compareTwoJSONObject(expect, accountController.getAccountInfo(1L,2L)));
 
 //JSONObject result;
 //    Account account = accountService.findAccountByUId(uId);

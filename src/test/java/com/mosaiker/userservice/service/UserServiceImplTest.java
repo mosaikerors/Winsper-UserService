@@ -1,32 +1,13 @@
-/*package com.mosaiker.userservice.service;
+package com.mosaiker.userservice.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.User;
 import com.mosaiker.userservice.repository.UserRepository;
-import com.zhenzi.sms.ZhenziSmsClient;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
-import org.junit.After;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -83,10 +64,10 @@ public class UserServiceImplTest {
     TestCase.assertTrue(userService.addUser("haha", "15201996737", "123") == 0);
   }
 
-    @Test
-    public void updateUser() {
-        User addUserTrue = new User("yjy3", "123456", "15201996737", 1, avatarUrl);
-        addUserTrue.setuId(10002L);
-        Assert.assertEquals(addUserTrue, userService.updateUser(addUserTrue));
-    }
-}*/
+  @Test
+  public void updateUser() {
+    User addUserTrue = new User("yjy3", "123456", "15201996737", 1);
+    addUserTrue.setuId(10002L);
+    Assert.assertEquals(addUserTrue, userService.updateUser(addUserTrue));
+  }
+}

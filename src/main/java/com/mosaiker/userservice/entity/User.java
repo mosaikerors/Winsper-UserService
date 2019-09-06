@@ -15,7 +15,7 @@ public class User {
     private String password;
     private String phone;
     private int status;  //status: 0 - 被禁用， 1 - 普通用户， 2 - 会员
-    private int isOpen;
+
 
     public User() {
 
@@ -26,14 +26,12 @@ public class User {
         this.password = password;
         this.phone = phone;
         this.status = status;
-        this.isOpen = isOpen;
     }
     public User(String username, String password, String phone, int status) {
         this.username = username;
         this.password = password;
         this.phone = phone;
         this.status = status;
-        this.isOpen = 1;
     }
     @Id
     @Column(name = "u_id", nullable = false)
@@ -43,15 +41,6 @@ public class User {
 
     public void setuId(long uId) {
         this.uId = uId;
-    }
-    @Basic
-    @Column(name = "isOpen", nullable = false)
-    public int getIsOpen() {
-        return isOpen;
-    }
-
-    public void setIsOpen(int isOpen) {
-        this.isOpen = isOpen;
     }
 
 

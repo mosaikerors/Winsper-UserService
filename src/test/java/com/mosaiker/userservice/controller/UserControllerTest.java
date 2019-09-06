@@ -1,5 +1,6 @@
 package com.mosaiker.userservice.controller;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyObject;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 
 /**
  * UserController Tester.
@@ -305,7 +307,7 @@ public class UserControllerTest {
     JSONObject expected1 = new JSONObject();
     expected1.put("rescode", 0);
 
-    mockMvc.perform(MockMvcRequestBuilders.put("/update/username")
+    mockMvc.perform(MockMvcRequestBuilders.put("/username/update")
         .accept(MediaType.APPLICATION_JSON)
         .header("uId", 1234L)
         .contentType(MediaType.APPLICATION_JSON).content(mockParam.toJSONString()))
@@ -322,7 +324,7 @@ public class UserControllerTest {
     when(userService.findUserByUId(1235L)).thenReturn(null);
     JSONObject expected2 = new JSONObject();
     expected2.put("rescode", 1);
-    mockMvc.perform(MockMvcRequestBuilders.put("/update/username")
+    mockMvc.perform(MockMvcRequestBuilders.put("/username/update")
         .accept(MediaType.APPLICATION_JSON)
         .header("uId", 1234L)
         .contentType(MediaType.APPLICATION_JSON).content(mockParam.toJSONString()))
@@ -341,12 +343,15 @@ public class UserControllerTest {
   @Test
   public void testGetSimpleInfo() throws Exception {
     when(accountService.findAccountByUId(1L)).thenReturn(new Account(1L));
+    when(accountService.findAccountByUId(2L)).thenReturn(new Account(2L));
     when(accountService.findAccountByUId(3L)).thenReturn(null);
     when(userService.findUserByUId(1L)).thenReturn(user1);
+    when(userService.findUserByUId(2L)).thenReturn(null);
     when(userService.findUserByUId(3L)).thenReturn(null);
     JSONObject expect_ok = new JSONObject() {{
       put("rescode", 0);
-      put("avatarUrl", "");
+      put("uId", 1L);
+      put("avatarUrl", new Account(1L).getAvatarUrl());
       put("username", "test");
       put("isHeanPublic", true);
       put("isCollectionPublic", true);
@@ -355,10 +360,91 @@ public class UserControllerTest {
       put("rescode", 1);
     }};
     assertTrue(MyJSONUtil.compareTwoJSONObject(expect_ok, userController.getSimpleInfo(1L)));
+    assertTrue(MyJSONUtil.compareTwoJSONObject(expect_null, userController.getSimpleInfo(2L)));
     assertTrue(MyJSONUtil.compareTwoJSONObject(expect_null, userController.getSimpleInfo(3L)));
 
   }
 
+  /**
+   * Method: forgetPassword(@RequestBody JSONObject request)
+   */
+  @Test
+  public void testForgetPassword() {
+    JSONObject req_ok = new JSONObject() {{
+      put("token", "token");
+      put("phone", "13000111222");
+      put("code", "101010");
+      put("password", "123456");
+    }};
+    JSONObject req_fail = new JSONObject() {{
+      put("token", "token");
+      put("phone", "13000111222");
+      put("code", "111111");
+    }};
+    when(tokenService.verifyCodeToken("token", "13000111222", "101010")).thenReturn(0);
+    when(tokenService.verifyCodeToken("token", "13000111222", "111111")).thenReturn(1);
+    when(userService.findUserByPhone("13000111222")).thenReturn(user1);
+    when(userService.updateUser(user1)).thenReturn(user1);
+    JSONObject exp_ok = new JSONObject() {{
+      put("rescode", 0);
+    }};
+    JSONObject exp_fail = new JSONObject() {{
+      put("rescode", 1);
+    }};
 
+    assertTrue(MyJSONUtil.compareTwoJSONObject(exp_ok, userController.forgetPassword(req_ok)));
+    assertTrue(MyJSONUtil.compareTwoJSONObject(exp_fail, userController.forgetPassword(req_fail)));
+
+  }
+
+  /**
+   * Method: forgetSendCode(@RequestBody JSONObject request)
+   */
+  @Test
+  public void testForgetSendCode() {
+    JSONObject req_notexist = new JSONObject() {{
+      put("phone", "10086");
+    }};
+    JSONObject req_fail = new JSONObject() {{
+      put("phone", "13111333777");
+    }};
+
+    when(userService.findUserByPhone("10086")).thenReturn(null);
+    when(userService.findUserByPhone("13111333777")).thenReturn(user1);
+    when(userService.sendCode(eq("13111333777"), anyString())).thenReturn("fail");
+
+    JSONObject exp_notexist = new JSONObject() {{
+      put("rescode", 3);
+    }};
+    JSONObject exp_fail = new JSONObject() {{
+      put("rescode", 4);
+    }};
+    assertTrue(
+        MyJSONUtil.compareTwoJSONObject(exp_notexist, userController.forgetSendCode(req_notexist)));
+    assertTrue(MyJSONUtil.compareTwoJSONObject(exp_fail, userController.forgetSendCode(req_fail)));
+
+    when(userService.sendCode(eq("13111333777"), anyString())).thenReturn("ok");
+    assertEquals(0, userController.forgetSendCode(req_fail).get("rescode"));
+
+  }
+
+  /**
+   * Method: updatePassword(@RequestBody JSONObject request, @RequestHeader("uId") Long uId)
+   */
+  @Test
+  public void testUpdatePassword() {
+    JSONObject req = new JSONObject() {{
+      put("password", "123456");
+    }};
+    when(userService.findUserByUId(1L)).thenReturn(user1);
+    when(tokenService.createToken(eq(1L), anyString())).thenReturn("newToken");
+    when(userService.updateUser(user1)).thenReturn(user1);
+    JSONObject exp = new JSONObject() {{
+      put("rescode", 0);
+      put("token", "newToken");
+    }};
+    assertTrue(MyJSONUtil.compareTwoJSONObject(exp, userController.updatePassword(req, 1L)));
+
+  }
 }
 
