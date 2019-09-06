@@ -16,23 +16,25 @@ public class User {
     private String phone;
     private int status;  //status: 0 - 被禁用， 1 - 普通用户， 2 - 会员
 
+    public void setFirstin(Long firstin) {
+        this.firstin = firstin;
+    }
+
+    private Long firstin; //注册时间
+
 
     public User() {
 
     }
 
-    public User(String username, String password, String phone, int status,int isOpen) {
-        this.username = username;
-        this.password = password;
-        this.phone = phone;
-        this.status = status;
-    }
     public User(String username, String password, String phone, int status) {
         this.username = username;
         this.password = password;
         this.phone = phone;
         this.status = status;
+        this.firstin = 0L;
     }
+
     @Id
     @Column(name = "u_id", nullable = false)
     public long getuId() {

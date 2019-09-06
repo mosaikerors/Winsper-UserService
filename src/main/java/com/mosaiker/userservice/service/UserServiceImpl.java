@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.User;
 import com.mosaiker.userservice.repository.UserRepository;
 import com.zhenzi.sms.ZhenziSmsClient;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsUserByPhone(phone))
             return 3;
         User user = new User(name, password, phone, 1);
+        user.setFirstin(new Date().getTime());
         userRepository.save(user);
         return 0;
     }
