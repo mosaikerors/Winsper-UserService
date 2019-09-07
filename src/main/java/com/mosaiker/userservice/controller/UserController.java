@@ -165,7 +165,7 @@ public class UserController {
     Integer msg = tokenService.verifyCodeToken(token, phone, request.getString("code"));
     if (msg == 0) {
       User user = userService.findUserByPhone(phone);
-      user.setPassword(request.getString("password"));
+      user.setPassword(Utils.encryptPassword(request.getString("password")));
       userService.updateUser(user);
       result.put("rescode", 0);
       return result;
@@ -199,7 +199,7 @@ public class UserController {
     String password = request.getString("password");
     JSONObject result = new JSONObject();
     User user = userService.findUserByUId(uId);
-    user.setPassword(password);
+    user.setPassword(Utils.encryptPassword(password));
     String newToken = tokenService.createToken(uId, Utils.statusToRole(user.getStatus()));
     userService.updateUser(user);
     result.put("rescode", 0);
