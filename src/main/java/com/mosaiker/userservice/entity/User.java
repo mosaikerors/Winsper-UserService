@@ -21,13 +21,7 @@ public class User {
     private String password;
     private String phone;
     private int status;  //status: 0 - 被禁用， 1 - 普通用户， 2 - 会员
-
-    public void setFirstin(Long firstin) {
-        this.firstin = firstin;
-    }
-
     private Long firstin; //注册时间
-
 
     public User() {
 
@@ -117,5 +111,13 @@ public class User {
         result = 31 * result + (phone != null ? phone.hashCode() : 0);
         result = 31 * result + status;
         return result;
+    }
+
+    public Long getFirstin() {
+        return firstin;
+    }
+
+    public void setFirstin(Long firstin) {
+        this.firstin = firstin;
     }
 }
