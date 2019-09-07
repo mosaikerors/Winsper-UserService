@@ -3,6 +3,7 @@ package com.mosaiker.userservice.service;
 import com.alibaba.fastjson.JSONObject;
 import com.mosaiker.userservice.entity.User;
 import com.mosaiker.userservice.repository.UserRepository;
+import com.mosaiker.userservice.utils.Utils;
 import com.zhenzi.sms.ZhenziSmsClient;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
     public Integer addUser(String name, String phone, String password) {
         if (userRepository.existsUserByPhone(phone))
             return 3;
-        User user = new User(name, password, phone, 1);
+        User user = new User(name, Utils.encryptPassword(password), phone, 1);
         user.setFirstin(new Date().getTime());
         userRepository.save(user);
         return 0;
@@ -53,12 +54,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByPhoneAndPassword(String phone, String password){
-        return userRepository.findUserByPhoneAndPassword(phone, password);
+        return userRepository.findUserByPhoneAndPassword(phone, Utils.encryptPassword(password));
     }
 
     @Override
     public User findUserByUIdAndPassword(Long uId, String password){
-        return userRepository.findUserByUIdAndPassword(uId, password);
+        return userRepository.findUserByUIdAndPassword(uId, Utils.encryptPassword(password));
     }
 
     @Override

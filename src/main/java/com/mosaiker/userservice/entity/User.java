@@ -14,12 +14,6 @@ public class User {
     @GeneratedValue
     private long uId;
     private String username;
-
-    @Column(name = "password")
-    @ColumnTransformer(
-            read = "AES_DECRYPT(UNHEX(password), 'ankon')",
-            write = "HEX(AES_ENCRYPT(?, 'ankon'))"
-    )
     private String password;
     private String phone;
     private int status;  //status: 0 - 被禁用， 1 - 普通用户， 2 - 会员
@@ -59,6 +53,7 @@ public class User {
     }
 
     @Basic
+    @Column(name = "password")
     public String getPassword() {
         return password;
     }
