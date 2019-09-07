@@ -14,8 +14,9 @@ public class User {
     @GeneratedValue
     private long uId;
     private String username;
+    @Column(name = "password")
     @ColumnTransformer(
-            read = "decrypt(PASSWORD)",
+            read = "decrypt(password)",
             write = "encrypt(nvl(?, 'null'))"
     )
     private String password;
@@ -57,7 +58,6 @@ public class User {
     }
 
     @Basic
-    @Column(name = "password", nullable = false, length = 32)
     public String getPassword() {
         return password;
     }
@@ -113,6 +113,8 @@ public class User {
         return result;
     }
 
+    @Basic
+    @Column(name = "firstin", nullable = false)
     public Long getFirstin() {
         return firstin;
     }
