@@ -14,10 +14,11 @@ public class User {
     @GeneratedValue
     private long uId;
     private String username;
+
     @Column(name = "password")
     @ColumnTransformer(
-            read = "decrypt(password)",
-            write = "encrypt(nvl(?, 'null'))"
+            read = "AES_DECRYPT(UNHEX(password), 'ankon')",
+            write = "HEX(AES_ENCRYPT(?, 'ankon'))"
     )
     private String password;
     private String phone;
